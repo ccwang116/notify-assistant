@@ -39,7 +39,25 @@ const getStockInfo = (stockId, tracePrice) => {
       console.error(error);
     });
 };
-
+const getBusInfo = () => {
+  axios
+    .get(
+      `https://pda.5284.gov.taipei/MQS/RouteDyna?routeid=10172&nocache=${dayjs().valueOf()}`
+    )
+    .then((response) => {
+      const stop = response.data.Stop.find((ele) => ele.id === 34528);
+      const infoList = stop.n1.split(",");
+      const count = Math.floor(infoList[7] / 60);
+      if (count === -1) {
+        makeNotify(`243公車文化里無資訊`);
+      } else {
+        makeNotify(`243公車還有 ${count} 分鐘抵達文化里`);
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
 //get info every 5 secs during MON to FRI morning
 setInterval(() => {
   if (
@@ -56,6 +74,13 @@ setInterval(() => {
     }
   }
 }, 5000);
+
+setInterval(() => {
+  const timeNow = dayjs().format("HH:mm");
+  if (timeNow === "08:11" || timeNow === "08:20") {
+    getBusInfo();
+  }
+}, 60000);
 
 app.get("/", (req, res) => {
   res.send("hello world!");
