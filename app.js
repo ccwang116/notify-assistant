@@ -19,15 +19,18 @@ const getStockInfo = (stockId, tracePrice) => {
       `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockId}.tw&json=1&delay=0`
     )
     .then((response) => {
-      const stockName = response.data.msgArray[0].n;
-      const price = +response.data.msgArray[0].z;
+      const targetStock = response.data.msgArray
+        ? response.data.msgArray[0]
+        : null;
+      const stockName = targetStock ? targetStock.n : "無資料";
+      const price = targetStock ? +targetStock.z : 0;
       console.log(stockName, price);
       if (price >= tracePrice && price < tracePrice + 1) {
         if (
           !traceLog[`${stockName}-${tracePrice}`] ||
           dayjs().diff(traceLog[`${stockName}-${tracePrice}`], "m") > 30
         ) {
-          makeNotify(`${stockName}: ${price}`);
+          makeNotify(`台股報價\n${stockName}: ${price}`);
           traceLog[`${stockName}-${tracePrice}`] = dayjs().format(
             "YYYY/MM/DD HH:mm:ss"
           );
@@ -51,13 +54,26 @@ const getBusInfo = () => {
       if (count === -1) {
         makeNotify(`243公車文化里無資訊`);
       } else {
-        makeNotify(`243公車還有 ${count} 分鐘抵達文化里`);
+        makeNotify(`公車資訊\n243公車還有 ${count} 分鐘抵達文化里`);
       }
     })
     .catch((error) => {
       console.error(error);
     });
 };
+let totalQuery = "";
+for (let i = 0; i < stockList.list.length; i++) {
+  const element = stockList.list[i];
+  totalQuery += element.stockId;
+  totalQuery += "：";
+  totalQuery += element.tracePrice;
+  if (i !== stockList.list.length - 1) {
+    totalQuery += "\n";
+  }
+}
+// getBusInfo();
+// makeNotify(`台股目前追蹤\n${totalQuery}`);
+
 //get info every 5 secs during MON to FRI morning
 setInterval(() => {
   if (

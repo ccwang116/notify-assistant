@@ -3,11 +3,13 @@ const axios = require("axios");
 
 const webhook_url = "https://notify-api.line.me/api/notify";
 
-const oauthToken = "Ha7p8dpUaSNug7pGFGKi8lyyMfUblVaYkzNTi49iSax";
+const oauthToken = process.env["LINE_NOTIFY_OAUTHTOKEN_ME"];
 
 const makeNotify = (text) => {
   const data = new URLSearchParams();
   data.append("message", text);
+  // data.append("stickerPackageId", 789); //出發去: 789 + 10871 慶祝: 11537 + 52002734
+  // data.append("stickerId", 10871);
   axios
     .post(webhook_url, data, {
       headers: {

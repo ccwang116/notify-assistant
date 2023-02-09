@@ -5,7 +5,7 @@ const axios = require("axios");
 
 const webhook_url = "https://notify-api.line.me/api/notify";
 
-const oauthToken = "Ha7p8dpUaSNug7pGFGKi8lyyMfUblVaYkzNTi49iSax";
+const oauthToken = process.env["LINE_NOTIFY_OAUTHTOKEN_ME"];
 
 const data = new URLSearchParams();
 data.append("message", "鬧鐘");
