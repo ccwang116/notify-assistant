@@ -6,6 +6,7 @@ const app = express();
 const port = 5001;
 
 const stockList = require("./trace-info.json");
+const stickerMap = require("./weather-sticker.json");
 
 const lineNotifyRouter = require("./routes/line-notify");
 const pushMsg = require("./routes/push-msg");
@@ -84,8 +85,20 @@ const getWeatherInfo = () => {
       const MaxT = getValue(contentList, "MaxT");
       const description = getValue(contentList, "WeatherDescription");
       //makeNotify(`${locationName}天氣:\n${description}`);
+      let stickerIdx = "0";
+      if (+PoP12h >= 0 && +PoP12h < 31) {
+        stickerIdx = "0";
+      } else if (+PoP12h >= 31 && +PoP12h < 51) {
+        stickerIdx = "10";
+      } else if (+PoP12h >= 51 && +PoP12h < 81) {
+        stickerIdx = "50";
+      } else if (+PoP12h >= 81 && +PoP12h < 101) {
+        stickerIdx = "80";
+      }
       makeNotify(
-        `${locationName}天氣:\n溫度${MinT}~${MaxT}度，降雨機率${PoP12h}%`
+        `${locationName}天氣:\n溫度${MinT}~${MaxT}度，降雨機率${PoP12h}%`,
+        true,
+        stickerMap[stickerIdx]
       );
     })
     .catch((error) => {
@@ -102,6 +115,7 @@ for (let i = 0; i < stockList.list.length; i++) {
     totalQuery += "\n";
   }
 }
+// getWeatherInfo();
 // getBusInfo();
 // makeNotify(`台股目前追蹤\n${totalQuery}`);
 
