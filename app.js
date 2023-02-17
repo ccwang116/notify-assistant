@@ -61,6 +61,37 @@ const getBusInfo = () => {
       console.error(error);
     });
 };
+const getWeatherInfo = () => {
+  const getValue = (list, key) => {
+    return list.find((e) => e.elementName === key).time[0].elementValue[0]
+      .value;
+  };
+  axios
+    .get(
+      `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
+        process.env["CWB_AUTHORIZATION"]
+      }&locationId=F-D0047-071&locationName=永和區&startTime=${dayjs().format(
+        "YYYY-MM-DDT12:00:00"
+      )}`
+    )
+    .then((response) => {
+      const locationName =
+        response.data.records.locations[0].location[0].locationName;
+      const contentList =
+        response.data.records.locations[0].location[0].weatherElement;
+      const PoP12h = getValue(contentList, "PoP12h");
+      const MinT = getValue(contentList, "MinT");
+      const MaxT = getValue(contentList, "MaxT");
+      const description = getValue(contentList, "WeatherDescription");
+      //makeNotify(`${locationName}天氣:\n${description}`);
+      makeNotify(
+        `${locationName}天氣:\n溫度${MinT}~${MaxT}度，降雨機率${PoP12h}%`
+      );
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
 let totalQuery = "";
 for (let i = 0; i < stockList.list.length; i++) {
   const element = stockList.list[i];
@@ -95,6 +126,9 @@ setInterval(() => {
   const timeNow = dayjs().format("HH:mm");
   if (timeNow === "08:11" || timeNow === "08:20") {
     getBusInfo();
+  }
+  if (timeNow === "08:00") {
+    getWeatherInfo();
   }
 }, 60000);
 
