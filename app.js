@@ -138,10 +138,10 @@ setInterval(() => {
 
 setInterval(() => {
   const timeNow = dayjs().format("HH:mm");
-  if (timeNow === "08:11" || timeNow === "08:20") {
+  if (timeNow === "08:20" || timeNow === "08:25") {
     getBusInfo();
   }
-  if (timeNow === "08:00") {
+  if (timeNow === "08:05") {
     getWeatherInfo();
   }
 }, 60000);
