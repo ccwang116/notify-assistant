@@ -1,6 +1,7 @@
 require("dotenv").config();
 const dayjs = require("dayjs");
 const express = require("express");
+const bodyParser = require("body-parser");
 const axios = require("axios");
 const app = express();
 const port = 5001;
@@ -11,6 +12,12 @@ const stickerMap = require("./weather-sticker.json");
 const lineNotifyRouter = require("./routes/line-notify");
 const pushMsg = require("./routes/push-msg");
 const makeNotify = require("./routes/make-notify");
+
+// create application/json parser
+const jsonParser = bodyParser.json();
+
+// create application/x-www-form-urlencoded parser
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const handleMatchPrice = (price, tracePrice, stockName, traceLog) => {
   if (price >= tracePrice && price < tracePrice + 1) {
@@ -124,7 +131,7 @@ for (let i = 0; i < stockList.tracks.length; i++) {
 }
 // getWeatherInfo();
 // getBusInfo();
-makeNotify(`台股目前追蹤\n${totalQuery}`);
+// makeNotify(`台股目前追蹤\n${totalQuery}`);
 
 //get info every 5 secs during MON to FRI morning
 setInterval(() => {
@@ -136,10 +143,14 @@ setInterval(() => {
     dayjs().hour() < 14
   ) {
     console.log("Wait for 5 second...");
-    for (let i = 0; i < stockList.tracks.length; i++) {
-      const element = stockList.tracks[i];
-      getStockInfo(element.stockId, element.tracePrice);
-    }
+    axios.get("http://localhost:5000/tracks").then((res) => {
+      console.log(res.data);
+      const list = res.data;
+      for (let i = 0; i < list.length; i++) {
+        const element = list[i];
+        getStockInfo(element.stockId, element.tracePrice);
+      }
+    });
   }
 }, 5000);
 
@@ -156,7 +167,43 @@ setInterval(() => {
 app.get("/", (req, res) => {
   res.send("hello world!");
 });
+app.post("/tracks", jsonParser, (req, res) => {
+  const payload = {
+    stockId: req.body.stockId,
+    tracePrice: [+req.body.tracePrice],
+  };
 
+  axios
+    .post(`http://localhost:5000/tracks`, payload)
+    .then((result) => {
+      res.redirect("/");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+app.get("/tracks/:id/delete", function (req, res) {
+  axios
+    .delete(`http://localhost:5000/tracks/${req.params.id}`)
+    .then((result) => {
+      res.redirect("/");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+app.post("/tracks/:id/edit", jsonParser, function (req, res) {
+  const payload = { tracePrice: [+req.body.tracePrice] };
+  console.log(payload);
+  axios
+    .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
+    .then((result) => {
+      res.redirect("/");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
 app.use("/login/line_notify", lineNotifyRouter);
 
 app.get("/callback", async function (req, res, next) {
