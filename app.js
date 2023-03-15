@@ -5,16 +5,30 @@ const axios = require("axios");
 const app = express();
 const port = 5001;
 
-const stockList = require("./trace-info.json");
+const stockList = require("./db.json");
 const stickerMap = require("./weather-sticker.json");
 
 const lineNotifyRouter = require("./routes/line-notify");
 const pushMsg = require("./routes/push-msg");
 const makeNotify = require("./routes/make-notify");
 
+const handleMatchPrice = (price, tracePrice, stockName, traceLog) => {
+  if (price >= tracePrice && price < tracePrice + 1) {
+    if (
+      !traceLog[`${stockName}-${tracePrice}`] ||
+      dayjs().diff(traceLog[`${stockName}-${tracePrice}`], "m") > 30
+    ) {
+      // console.log(`台股報價\n${stockName}: ${price}`);
+      makeNotify(`台股報價\n${stockName}: ${price}`);
+      traceLog[`${stockName}-${tracePrice}`] = dayjs().format(
+        "YYYY/MM/DD HH:mm:ss"
+      );
+    }
+  }
+};
 //only notify when last notification is over 30 minutes
 let traceLog = {};
-const getStockInfo = (stockId, tracePrice) => {
+const getStockInfo = (stockId, tracePriceList) => {
   axios
     .get(
       `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockId}.tw&json=1&delay=0`
@@ -26,23 +40,16 @@ const getStockInfo = (stockId, tracePrice) => {
       const stockName = targetStock ? targetStock.n : "無資料";
       const price = targetStock ? +targetStock.z : 0;
       console.log(stockName, price);
-      if (price >= tracePrice && price < tracePrice + 1) {
-        if (
-          !traceLog[`${stockName}-${tracePrice}`] ||
-          dayjs().diff(traceLog[`${stockName}-${tracePrice}`], "m") > 30
-        ) {
-          makeNotify(`台股報價\n${stockName}: ${price}`);
-          traceLog[`${stockName}-${tracePrice}`] = dayjs().format(
-            "YYYY/MM/DD HH:mm:ss"
-          );
-        }
-      }
+      tracePriceList.forEach((tracePrice) => {
+        handleMatchPrice(price, tracePrice, stockName, traceLog);
+      });
       // console.log("traceLog", traceLog);
     })
     .catch((error) => {
       console.error(error);
     });
 };
+
 const getBusInfo = () => {
   axios
     .get(
@@ -106,18 +113,18 @@ const getWeatherInfo = () => {
     });
 };
 let totalQuery = "";
-for (let i = 0; i < stockList.list.length; i++) {
-  const element = stockList.list[i];
+for (let i = 0; i < stockList.tracks.length; i++) {
+  const element = stockList.tracks[i];
   totalQuery += element.stockId;
   totalQuery += "：";
-  totalQuery += element.tracePrice;
-  if (i !== stockList.list.length - 1) {
+  totalQuery += element.tracePrice.join(",");
+  if (i !== stockList.tracks.length - 1) {
     totalQuery += "\n";
   }
 }
 // getWeatherInfo();
 // getBusInfo();
-// makeNotify(`台股目前追蹤\n${totalQuery}`);
+makeNotify(`台股目前追蹤\n${totalQuery}`);
 
 //get info every 5 secs during MON to FRI morning
 setInterval(() => {
@@ -129,8 +136,8 @@ setInterval(() => {
     dayjs().hour() < 14
   ) {
     console.log("Wait for 5 second...");
-    for (let i = 0; i < stockList.list.length; i++) {
-      const element = stockList.list[i];
+    for (let i = 0; i < stockList.tracks.length; i++) {
+      const element = stockList.tracks[i];
       getStockInfo(element.stockId, element.tracePrice);
     }
   }
