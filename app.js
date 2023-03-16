@@ -1,9 +1,11 @@
 require("dotenv").config();
 const dayjs = require("dayjs");
 const express = require("express");
+const path = require("path");
 const bodyParser = require("body-parser");
 const axios = require("axios");
 const app = express();
+
 const port = 5001;
 
 const stockList = require("./db.json");
@@ -18,6 +20,9 @@ const jsonParser = bodyParser.json();
 
 // create application/x-www-form-urlencoded parser
 const urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+app.set("views", __dirname + "/views");
+app.set("view engine", "pug");
 
 const handleMatchPrice = (price, tracePrice, stockName, traceLog) => {
   if (price >= tracePrice && price < tracePrice + 1) {
@@ -165,14 +170,27 @@ setInterval(() => {
 }, 60000);
 
 app.get("/", (req, res) => {
-  res.send("hello world!");
+  axios.get("http://localhost:5000/tracks").then((result) => {
+    const list = result.data;
+    res.render("stock", {
+      initialValue: { stockId: "", tracePrice: "" },
+      title: "Stock Tracker",
+      results: list,
+      form_action: "/tracks",
+    });
+  });
 });
-app.post("/tracks", jsonParser, (req, res) => {
+app.get("/weather", (req, res) => {
+  res.render("weather", {
+    title: "Weather page",
+  });
+});
+//create
+app.post("/tracks", urlencodedParser, (req, res) => {
   const payload = {
     stockId: req.body.stockId,
     tracePrice: [+req.body.tracePrice],
   };
-
   axios
     .post(`http://localhost:5000/tracks`, payload)
     .then((result) => {
@@ -182,6 +200,7 @@ app.post("/tracks", jsonParser, (req, res) => {
       console.error(error);
     });
 });
+//delete
 app.get("/tracks/:id/delete", function (req, res) {
   axios
     .delete(`http://localhost:5000/tracks/${req.params.id}`)
@@ -192,8 +211,26 @@ app.get("/tracks/:id/delete", function (req, res) {
       console.error(error);
     });
 });
-app.post("/tracks/:id/edit", jsonParser, function (req, res) {
-  const payload = { tracePrice: [+req.body.tracePrice] };
+//  delete a price of a stock
+app.get("/tracks/:id/delete/:price/:priceList", function (req, res) {
+  let priceList = req.params.priceList.split("_");
+  const payload = {
+    tracePrice: priceList.filter((e) => e !== req.params.price).map((e) => +e),
+  };
+  axios
+    .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
+    .then((result) => {
+      res.redirect("/");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+//  add a price of a stock
+app.post("/tracks/:id/edit/:priceList", urlencodedParser, function (req, res) {
+  let priceList = req.params.priceList.split("_");
+  priceList.push(req.body.tracePrice);
+  const payload = { tracePrice: priceList.map((e) => +e) };
   console.log(payload);
   axios
     .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
@@ -218,9 +255,13 @@ app.get("/callback", async function (req, res, next) {
       console.error(error);
     });
 });
-
+//status example
+// res.status(200).json({
+//   message: "Edit Success!",
+//   data: result.data,
+// });
 app.use("/push", pushMsg);
-
+app.use(express.static(path.join(__dirname, "public")));
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });

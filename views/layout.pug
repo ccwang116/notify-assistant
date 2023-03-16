@@ -1,0 +1,15 @@
+html
+  head
+    title Notify assistant
+    link(rel='stylesheet', type='text/css', href='/css/styles.css')
+  body
+    .container
+        header.d-flex.flex-wrap.justify-content-center.py-3.mb-4
+            a.d-flex.align-items-center.mb-3.mb-md-0.me-md-auto.text-dark.text-decoration-none(href='/')
+                span.fs-4 Notify assistant
+            a.btn.btn-outline-primary(href='/') Home
+        h2.mb-4=title
+        block content
+
+        footer
+        p Site Footer

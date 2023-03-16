@@ -1,0 +1,8 @@
+form(method="post",action=form_action)
+  .form-group
+    label(for='stockId') Stock Id
+    input#stockId.form-control(type='text' name='stockId' value=initialValue.stockId)
+  .form-group
+    label(for='tracePrice') Trace Price
+    input#tracePrice.form-control(type='text' name='tracePrice' value=initialValue.tracePrice)
+  button.btn.btn-primary(type='submit') Submit
