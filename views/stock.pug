@@ -7,12 +7,11 @@ block content
       .list-group-item.list-group-item-action.d-flex.gap-3.py-3
         .d-flex.gap-2.w-100.justify-content-between
           div
-            h6.mb-0=row.stockId
+            h6.mb-3=row.stockId
             each price in row.tracePrice
-                span.badge.badge-info.badge-pill.mr-2=price
+                span.badge.badge-secondary.badge-pill.mr-2.mb-3=price
                     span.badge.badge-pill.ml-1: a(href=`/tracks/${row.id}/delete/${price}/${row.tracePrice.join("_")}`) X
-            p
-                form.form-inline(method="post",action=`/tracks/${row.id}/edit/${row.tracePrice.join("_")}`)
-                  input.mr-2.form-control.form-control-sm(type="text" name='tracePrice')
-                  button.badge.badge-pill(type='submit') Add price
+            form.form-inline(method="post",action=`/tracks/${row.id}/edit/${row.tracePrice.join("_")}`)
+              input.mr-2.form-control.form-control-sm(type="text" name='tracePrice')
+              button.btn.btn-outline-primary.btn-sm(type='submit') Add price
           small.opacity-50.text-nowrap.btn: a(href=`/tracks/${row.id}/delete`) X

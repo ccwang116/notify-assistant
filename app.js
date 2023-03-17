@@ -170,6 +170,16 @@ setInterval(() => {
 }, 60000);
 
 app.get("/", (req, res) => {
+  res.render("home", {
+    title: "Welcome!",
+    results: [
+      { title: "Stock", url: "/stock" },
+      { title: "Weather", url: "/weather" },
+      { title: "Bus", url: "/bus" },
+    ],
+  });
+});
+app.get("/stock", (req, res) => {
   axios.get("http://localhost:5000/tracks").then((result) => {
     const list = result.data;
     res.render("stock", {
@@ -185,6 +195,11 @@ app.get("/weather", (req, res) => {
     title: "Weather page",
   });
 });
+app.get("/bus", (req, res) => {
+  res.render("bus", {
+    title: "Bus page",
+  });
+});
 //create
 app.post("/tracks", urlencodedParser, (req, res) => {
   const payload = {
@@ -194,7 +209,7 @@ app.post("/tracks", urlencodedParser, (req, res) => {
   axios
     .post(`http://localhost:5000/tracks`, payload)
     .then((result) => {
-      res.redirect("/");
+      res.redirect("/stock");
     })
     .catch((error) => {
       console.error(error);
@@ -205,7 +220,7 @@ app.get("/tracks/:id/delete", function (req, res) {
   axios
     .delete(`http://localhost:5000/tracks/${req.params.id}`)
     .then((result) => {
-      res.redirect("/");
+      res.redirect("/stock");
     })
     .catch((error) => {
       console.error(error);
@@ -220,7 +235,7 @@ app.get("/tracks/:id/delete/:price/:priceList", function (req, res) {
   axios
     .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
     .then((result) => {
-      res.redirect("/");
+      res.redirect("/stock");
     })
     .catch((error) => {
       console.error(error);
@@ -235,7 +250,7 @@ app.post("/tracks/:id/edit/:priceList", urlencodedParser, function (req, res) {
   axios
     .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
     .then((result) => {
-      res.redirect("/");
+      res.redirect("/stock");
     })
     .catch((error) => {
       console.error(error);
