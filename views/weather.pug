@@ -1,4 +1,22 @@
 extends layout.pug
 
 block content
-  h2 hello 
+  h6 Location setting： 
+  .p-4.mb-3.bg-light.rounded
+    h6 
+    .d-flex.flex-wrap.justify-content-between.align-items-center
+      span=`City(id) : ${locationId}`
+      a.btn.btn-outline-primary.btn-sm(href='https://opendata.cwb.gov.tw/opendatadoc/CWB_Opendata_API_V1.2.pdf' target="_blank") See location id doc
+    h6 District Name: 
+     span=currentLocation
+  form(method="post",action=form_action)
+    .form-group
+      label(for='locationId') locationId
+      input#locationId.form-control(type='text' name='locationId' value=locationId)
+    .form-group
+      label(for='currentLocation') currentLocation
+      input#currentLocation.form-control(type='text' name='currentLocation' value=currentLocation)
+    .d-flex.flex-wrap.justify-content-center.align-items-center
+      button.btn.btn-primary.mr-2(type='submit') Submit
+      a.btn.btn-outline-primary(href=`/weather/${locationId}/${currentLocation}`) Notify now
+  

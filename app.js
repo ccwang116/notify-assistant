@@ -62,13 +62,13 @@ const getStockInfo = (stockId, tracePriceList) => {
     });
 };
 
-const getBusInfo = () => {
+const getBusInfo = (routeId, stopId) => {
   axios
     .get(
-      `https://pda.5284.gov.taipei/MQS/RouteDyna?routeid=10172&nocache=${dayjs().valueOf()}`
+      `https://pda.5284.gov.taipei/MQS/RouteDyna?routeid=${routeId}&nocache=${dayjs().valueOf()}`
     )
     .then((response) => {
-      const stop = response.data.Stop.find((ele) => ele.id === 34528);
+      const stop = response.data.Stop.find((ele) => ele.id === stopId);
       const infoList = stop.n1.split(",");
       const count = Math.floor(infoList[7] / 60);
       if (count === -1) {
@@ -81,16 +81,20 @@ const getBusInfo = () => {
       console.error(error);
     });
 };
-const getWeatherInfo = () => {
+const getWeatherInfo = (locationId, locationName) => {
   const getValue = (list, key) => {
-    return list.find((e) => e.elementName === key).time[0].elementValue[0]
+    return list.find((e) => e.elementName === key)?.time[0].elementValue[0]
+      .value;
+  };
+  const getValueOfThreeIdx = (list, key) => {
+    return list.find((e) => e.elementName === key)?.time[3].elementValue[0]
       .value;
   };
   axios
     .get(
       `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
         process.env["CWB_AUTHORIZATION"]
-      }&locationId=F-D0047-071&locationName=永和區&startTime=${dayjs().format(
+      }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs().format(
         "YYYY-MM-DDT12:00:00"
       )}`
     )
@@ -100,8 +104,8 @@ const getWeatherInfo = () => {
       const contentList =
         response.data.records.locations[0].location[0].weatherElement;
       const PoP12h = getValue(contentList, "PoP12h");
-      const MinT = getValue(contentList, "MinT");
-      const MaxT = getValue(contentList, "MaxT");
+      const MinT = getValueOfThreeIdx(contentList, "T");
+      const MaxT = getValue(contentList, "T");
       const description = getValue(contentList, "WeatherDescription");
       //makeNotify(`${locationName}天氣:\n${description}`);
       let stickerIdx = "0";
@@ -162,10 +166,16 @@ setInterval(() => {
 setInterval(() => {
   const timeNow = dayjs().format("HH:mm");
   if (timeNow === "08:20" || timeNow === "08:25") {
-    getBusInfo();
+    axios.get("http://localhost:5000/weather").then((result) => {
+      const list = result.data;
+      getBusInfo(list[0].routeId, list[0].stopId);
+    });
   }
   if (timeNow === "08:05") {
-    getWeatherInfo();
+    axios.get("http://localhost:5000/weather").then((result) => {
+      const list = result.data;
+      getWeatherInfo(list[0].locationId, list[0].locationName);
+    });
   }
 }, 60000);
 
@@ -191,14 +201,36 @@ app.get("/stock", (req, res) => {
   });
 });
 app.get("/weather", (req, res) => {
-  res.render("weather", {
-    title: "Weather page",
+  axios.get("http://localhost:5000/weather").then((result) => {
+    const list = result.data;
+    res.render("weather", {
+      title: "Weather page",
+      locationId: list[0].locationId,
+      currentLocation: list[0].locationName,
+      form_action: "/weather/edit",
+    });
   });
 });
+//notify now
+app.get("/weather/:locationId/:locationName", (req, res) => {
+  getWeatherInfo(req.params.locationId, req.params.locationName);
+  res.redirect("/weather");
+});
 app.get("/bus", (req, res) => {
-  res.render("bus", {
-    title: "Bus page",
+  axios.get("http://localhost:5000/bus").then((result) => {
+    const list = result.data;
+    res.render("bus", {
+      title: "Bus page",
+      routeId: list[0].routeId,
+      stopId: list[0].stopId,
+      form_action: "/bus/edit",
+    });
   });
+});
+//notify now
+app.get("/bus/:routeId/:stopId", (req, res) => {
+  getBusInfo(+req.params.routeId, +req.params.stopId);
+  res.redirect("/bus");
 });
 //create
 app.post("/tracks", urlencodedParser, (req, res) => {
@@ -251,6 +283,36 @@ app.post("/tracks/:id/edit/:priceList", urlencodedParser, function (req, res) {
     .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
     .then((result) => {
       res.redirect("/stock");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+//  edit
+app.post("/weather/edit", urlencodedParser, function (req, res) {
+  const payload = {
+    locationId: req.body.locationId,
+    locationName: req.body.currentLocation,
+  };
+  axios
+    .patch(`http://localhost:5000/weather/1`, payload)
+    .then((result) => {
+      res.redirect("/weather");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+//  edit
+app.post("/bus/edit", urlencodedParser, function (req, res) {
+  const payload = {
+    routeId: +req.body.routeId,
+    stopId: +req.body.stopId,
+  };
+  axios
+    .patch(`http://localhost:5000/bus/1`, payload)
+    .then((result) => {
+      res.redirect("/bus");
     })
     .catch((error) => {
       console.error(error);
