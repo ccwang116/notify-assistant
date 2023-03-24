@@ -12,6 +12,7 @@ const stockList = require("./db.json");
 const stickerMap = require("./weather-sticker.json");
 
 const lineNotifyRouter = require("./routes/line-notify");
+const tracksRouter = require("./routes/tracks.route");
 const pushMsg = require("./routes/push-msg");
 const makeNotify = require("./routes/make-notify");
 
@@ -178,7 +179,12 @@ setInterval(() => {
     });
   }
 }, 60000);
-
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
 app.get("/", (req, res) => {
   res.render("home", {
     title: "Welcome!",
@@ -232,62 +238,7 @@ app.get("/bus/:routeId/:stopId", (req, res) => {
   getBusInfo(+req.params.routeId, +req.params.stopId);
   res.redirect("/bus");
 });
-//create
-app.post("/tracks", urlencodedParser, (req, res) => {
-  const payload = {
-    stockId: req.body.stockId,
-    tracePrice: [+req.body.tracePrice],
-  };
-  axios
-    .post(`http://localhost:5000/tracks`, payload)
-    .then((result) => {
-      res.redirect("/stock");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
-//delete
-app.get("/tracks/:id/delete", function (req, res) {
-  axios
-    .delete(`http://localhost:5000/tracks/${req.params.id}`)
-    .then((result) => {
-      res.redirect("/stock");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
-//  delete a price of a stock
-app.get("/tracks/:id/delete/:price/:priceList", function (req, res) {
-  let priceList = req.params.priceList.split("_");
-  const payload = {
-    tracePrice: priceList.filter((e) => e !== req.params.price).map((e) => +e),
-  };
-  axios
-    .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
-    .then((result) => {
-      res.redirect("/stock");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
-//  add a price of a stock
-app.post("/tracks/:id/edit/:priceList", urlencodedParser, function (req, res) {
-  let priceList = req.params.priceList.split("_");
-  priceList.push(req.body.tracePrice);
-  const payload = { tracePrice: priceList.map((e) => +e) };
-  console.log(payload);
-  axios
-    .patch(`http://localhost:5000/tracks/${req.params.id}`, payload)
-    .then((result) => {
-      res.redirect("/stock");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
+app.use("/tracks", tracksRouter);
 //  edit
 app.post("/weather/edit", urlencodedParser, function (req, res) {
   const payload = {
