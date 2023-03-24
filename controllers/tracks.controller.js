@@ -1,5 +1,22 @@
 const tracks = require("../services/tracks.service");
 
+async function get(req, res, next) {
+  try {
+    const result = await tracks.get();
+    if (result.status === 200) {
+      const list = result.data;
+      res.render("stock", {
+        initialValue: { stockId: "", tracePrice: "" },
+        title: "Stock Tracker",
+        results: list,
+        form_action: "/tracks",
+      });
+    }
+  } catch (err) {
+    console.error(`Error while creating`, err);
+    next(err);
+  }
+}
 async function create(req, res, next) {
   try {
     const result = await tracks.create(req.body);
@@ -56,6 +73,7 @@ async function remove(req, res, next) {
 }
 
 module.exports = {
+  get,
   create,
   deletePrice,
   addPrice,

@@ -9,12 +9,15 @@ const app = express();
 const port = 5001;
 
 const stockList = require("./db.json");
-const stickerMap = require("./weather-sticker.json");
 
 const lineNotifyRouter = require("./routes/line-notify");
 const tracksRouter = require("./routes/tracks.route");
+const stockRouter = require("./routes/stock.route");
+const weatherRouter = require("./routes/weather.route");
 const pushMsg = require("./routes/push-msg");
-const makeNotify = require("./routes/make-notify");
+
+const makeNotify = require("./controllers/notify.controller");
+const { getWeatherInfo } = require("./controllers/weather.controller");
 
 // create application/json parser
 const jsonParser = bodyParser.json();
@@ -82,53 +85,7 @@ const getBusInfo = (routeId, stopId) => {
       console.error(error);
     });
 };
-const getWeatherInfo = (locationId, locationName) => {
-  const getValue = (list, key) => {
-    return list.find((e) => e.elementName === key)?.time[0].elementValue[0]
-      .value;
-  };
-  const getValueOfThreeIdx = (list, key) => {
-    return list.find((e) => e.elementName === key)?.time[3].elementValue[0]
-      .value;
-  };
-  axios
-    .get(
-      `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
-        process.env["CWB_AUTHORIZATION"]
-      }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs().format(
-        "YYYY-MM-DDT12:00:00"
-      )}`
-    )
-    .then((response) => {
-      const locationName =
-        response.data.records.locations[0].location[0].locationName;
-      const contentList =
-        response.data.records.locations[0].location[0].weatherElement;
-      const PoP12h = getValue(contentList, "PoP12h");
-      const MinT = getValueOfThreeIdx(contentList, "T");
-      const MaxT = getValue(contentList, "T");
-      const description = getValue(contentList, "WeatherDescription");
-      //makeNotify(`${locationName}天氣:\n${description}`);
-      let stickerIdx = "0";
-      if (+PoP12h >= 0 && +PoP12h < 31) {
-        stickerIdx = "0";
-      } else if (+PoP12h >= 31 && +PoP12h < 51) {
-        stickerIdx = "10";
-      } else if (+PoP12h >= 51 && +PoP12h < 81) {
-        stickerIdx = "50";
-      } else if (+PoP12h >= 81 && +PoP12h < 101) {
-        stickerIdx = "80";
-      }
-      makeNotify(
-        `${locationName}天氣:\n溫度${MinT}~${MaxT}度，降雨機率${PoP12h}%`,
-        true,
-        stickerMap[stickerIdx]
-      );
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-};
+
 let totalQuery = "";
 for (let i = 0; i < stockList.tracks.length; i++) {
   const element = stockList.tracks[i];
@@ -179,12 +136,14 @@ setInterval(() => {
     });
   }
 }, 60000);
+
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
   })
 );
+
 app.get("/", (req, res) => {
   res.render("home", {
     title: "Welcome!",
@@ -195,33 +154,12 @@ app.get("/", (req, res) => {
     ],
   });
 });
-app.get("/stock", (req, res) => {
-  axios.get("http://localhost:5000/tracks").then((result) => {
-    const list = result.data;
-    res.render("stock", {
-      initialValue: { stockId: "", tracePrice: "" },
-      title: "Stock Tracker",
-      results: list,
-      form_action: "/tracks",
-    });
-  });
-});
-app.get("/weather", (req, res) => {
-  axios.get("http://localhost:5000/weather").then((result) => {
-    const list = result.data;
-    res.render("weather", {
-      title: "Weather page",
-      locationId: list[0].locationId,
-      currentLocation: list[0].locationName,
-      form_action: "/weather/edit",
-    });
-  });
-});
-//notify now
-app.get("/weather/:locationId/:locationName", (req, res) => {
-  getWeatherInfo(req.params.locationId, req.params.locationName);
-  res.redirect("/weather");
-});
+app.use("/stock", stockRouter);
+
+app.use("/tracks", tracksRouter);
+
+app.use("/weather", weatherRouter);
+
 app.get("/bus", (req, res) => {
   axios.get("http://localhost:5000/bus").then((result) => {
     const list = result.data;
@@ -238,22 +176,7 @@ app.get("/bus/:routeId/:stopId", (req, res) => {
   getBusInfo(+req.params.routeId, +req.params.stopId);
   res.redirect("/bus");
 });
-app.use("/tracks", tracksRouter);
-//  edit
-app.post("/weather/edit", urlencodedParser, function (req, res) {
-  const payload = {
-    locationId: req.body.locationId,
-    locationName: req.body.currentLocation,
-  };
-  axios
-    .patch(`http://localhost:5000/weather/1`, payload)
-    .then((result) => {
-      res.redirect("/weather");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
+
 //  edit
 app.post("/bus/edit", urlencodedParser, function (req, res) {
   const payload = {

@@ -3,6 +3,10 @@
 // const config = require('../configs/general.config');
 const axios = require("axios");
 
+async function get() {
+  const result = await axios.get(`http://localhost:5000/tracks`);
+  return { ...result };
+}
 async function create(body) {
   const payload = {
     stockId: body.stockId,
@@ -40,6 +44,7 @@ async function remove(id) {
 }
 
 module.exports = {
+  get,
   create,
   remove,
   deletePrice,

@@ -3,21 +3,38 @@
     {
       "id": 1,
       "stockId": "2330",
-      "tracePrice": [540, 520]
+      "tracePrice": [
+        540,
+        520
+      ]
     },
     {
       "id": 2,
       "stockId": "0050",
-      "tracePrice": [124]
+      "tracePrice": [
+        124
+      ]
     },
     {
       "id": 3,
       "stockId": "2886",
-      "tracePrice": [35]
+      "tracePrice": [
+        35
+      ]
     }
   ],
   "weather": [
-    { "id": 1, "locationId": "F-D0047-071", "locationName": "永和區" }
+    {
+      "id": 1,
+      "locationId": "F-D0047-071",
+      "locationName": "永和區"
+    }
   ],
-  "bus": [{ "id": 1, "routeId": 10172, "stopId": 34528 }]
+  "bus": [
+    {
+      "id": 1,
+      "routeId": 10172,
+      "stopId": 34528
+    }
+  ]
 }
