@@ -1,4 +1,5 @@
 const tracks = require("../services/tracks.service");
+const axios = require("axios");
 
 async function get(req, res, next) {
   try {
@@ -72,10 +73,62 @@ async function remove(req, res, next) {
   }
 }
 
+const handleMatchPrice = (price, tracePrice, stockName, traceLog) => {
+  if (price >= tracePrice && price < tracePrice + 1) {
+    if (
+      !traceLog[`${stockName}-${tracePrice}`] ||
+      dayjs().diff(traceLog[`${stockName}-${tracePrice}`], "m") > 30
+    ) {
+      // console.log(`台股報價\n${stockName}: ${price}`);
+      makeNotify(`台股報價\n${stockName}: ${price}`);
+      traceLog[`${stockName}-${tracePrice}`] = dayjs().format(
+        "YYYY/MM/DD HH:mm:ss"
+      );
+    }
+  }
+};
+//only notify when last notification is over 30 minutes
+let traceLog = {};
+const getStockInfo = (stockId, tracePriceList) => {
+  axios
+    .get(
+      `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockId}.tw&json=1&delay=0`
+    )
+    .then((response) => {
+      const targetStock = response.data.msgArray
+        ? response.data.msgArray[0]
+        : null;
+      const stockName = targetStock ? targetStock.n : "無資料";
+      const price = targetStock ? +targetStock.z : 0;
+      console.log(stockName, price);
+      tracePriceList.forEach((tracePrice) => {
+        handleMatchPrice(price, tracePrice, stockName, traceLog);
+      });
+      // console.log("traceLog", traceLog);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+const notifyTotal = (stockList) => {
+  let totalQuery = "";
+  for (let i = 0; i < stockList.tracks.length; i++) {
+    const element = stockList.tracks[i];
+    totalQuery += element.stockId;
+    totalQuery += "：";
+    totalQuery += element.tracePrice.join(",");
+    if (i !== stockList.tracks.length - 1) {
+      totalQuery += "\n";
+    }
+  }
+  makeNotify(`台股目前追蹤\n${totalQuery}`);
+};
 module.exports = {
   get,
   create,
   deletePrice,
   addPrice,
   remove,
+  getStockInfo,
+  notifyTotal,
 };
