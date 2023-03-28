@@ -3,6 +3,7 @@ const dayjs = require("dayjs");
 
 const makeNotify = require("./notify.controller");
 const stickerMap = require("../weather-sticker.json");
+const weather = require("../services/weather.service");
 
 const getWeatherInfo = (locationId, locationName) => {
   const getValue = (list, key) => {
@@ -54,7 +55,7 @@ const getWeatherInfo = (locationId, locationName) => {
 
 async function get(req, res, next) {
   try {
-    const result = await axios.get("http://localhost:5000/weather");
+    const result = await weather.get();
     if (result.status === 200) {
       const list = result.data;
       res.render("weather", {
@@ -71,14 +72,7 @@ async function get(req, res, next) {
 }
 async function edit(req, res, next) {
   try {
-    const payload = {
-      locationId: req.body.locationId,
-      locationName: req.body.currentLocation,
-    };
-    const result = await axios.patch(
-      `http://localhost:5000/weather/1`,
-      payload
-    );
+    const result = await weather.edit(req.body);
     if (result.status === 200) {
       res.redirect("/weather");
     }

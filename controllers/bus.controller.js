@@ -2,6 +2,7 @@ const axios = require("axios");
 const dayjs = require("dayjs");
 
 const makeNotify = require("./notify.controller");
+const bus = require("../services/bus.service");
 
 const getBusInfo = (routeId, stopId) => {
   axios
@@ -24,7 +25,7 @@ const getBusInfo = (routeId, stopId) => {
 };
 async function get(req, res, next) {
   try {
-    const result = await axios.get("http://localhost:5000/bus");
+    const result = await bus.get();
     if (result.status === 200) {
       const list = result.data;
       res.render("bus", {
@@ -41,11 +42,7 @@ async function get(req, res, next) {
 }
 async function edit(req, res, next) {
   try {
-    const payload = {
-      routeId: +req.body.routeId,
-      stopId: +req.body.stopId,
-    };
-    const result = await axios.patch(`http://localhost:5000/bus/1`, payload);
+    const result = await bus.edit(req.body);
     if (result.status === 200) {
       res.redirect("/bus");
     }
