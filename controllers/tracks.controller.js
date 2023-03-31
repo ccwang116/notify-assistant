@@ -1,3 +1,4 @@
+const dayjs = require("dayjs");
 const tracks = require("../services/tracks.service");
 const axios = require("axios");
 const makeNotify = require("./notify.controller");
@@ -21,8 +22,21 @@ async function get(req, res, next) {
 }
 async function create(req, res, next) {
   try {
-    const result = await tracks.create(req.body);
-    if (result.status === 201) {
+    let result = {};
+    const total = await tracks.get();
+    const list = total.data;
+    //如追蹤股票已存在，則改為增加價格
+    if (list.some((e) => e.stockId === req.body.stockId)) {
+      const theStock = list.find((e) => e.stockId === req.body.stockId);
+      result = await tracks.addPrice(
+        theStock.tracePrice.join("_"),
+        req.body.tracePrice,
+        theStock.id
+      );
+    } else {
+      result = await tracks.create(req.body);
+    }
+    if (result.status === 201 || result.status === 200) {
       res.redirect("/stock");
     }
   } catch (err) {
@@ -32,12 +46,19 @@ async function create(req, res, next) {
 }
 
 async function deletePrice(req, res, next) {
+  let priceList = req.params.priceList.split("_");
   try {
-    const result = await tracks.deletePrice(
-      req.params.priceList,
-      req.params.price,
-      req.params.id
-    );
+    let result = {};
+    //如股票已剩下一個價格，則移除該追蹤單
+    if (priceList.length === 1) {
+      result = await tracks.remove(req.params.id);
+    } else {
+      result = await tracks.deletePrice(
+        req.params.priceList,
+        req.params.price,
+        req.params.id
+      );
+    }
     if (result.status === 200) {
       res.redirect("/stock");
     }
