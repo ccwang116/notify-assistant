@@ -14,6 +14,7 @@ const stockRouter = require("./routes/stock.route");
 const weatherRouter = require("./routes/weather.route");
 const busRouter = require("./routes/bus.route");
 const pushMsg = require("./routes/push-msg.route");
+const mockData = require("./db.json");
 
 const { getStockInfo } = require("./controllers/tracks.controller");
 const { getWeatherInfo } = require("./controllers/weather.controller");
@@ -32,30 +33,24 @@ setInterval(() => {
     dayjs().hour() < 14
   ) {
     console.log("Wait for 5 second...");
-    axios.get("http://localhost:5000/tracks").then((res) => {
-      console.log(res.data);
-      const list = res.data;
-      for (let i = 0; i < list.length; i++) {
-        const element = list[i];
-        getStockInfo(element.stockId, element.tracePrice);
-      }
-    });
+    const list = mockData.tracks;
+    console.log(list);
+    for (let i = 0; i < list.length; i++) {
+      const element = list[i];
+      getStockInfo(element.stockId, element.tracePrice);
+    }
   }
 }, 5000);
 
 setInterval(() => {
   const timeNow = dayjs().format("HH:mm");
   if (timeNow === "08:20" || timeNow === "08:25") {
-    axios.get("http://localhost:5000/weather").then((result) => {
-      const list = result.data;
-      getBusInfo(list[0].routeId, list[0].stopId);
-    });
+    const list = mockData.bus;
+    getBusInfo(list[0].routeId, list[0].stopId);
   }
   if (timeNow === "08:05") {
-    axios.get("http://localhost:5000/weather").then((result) => {
-      const list = result.data;
-      getWeatherInfo(list[0].locationId, list[0].locationName);
-    });
+    const list = mockData.weather;
+    getWeatherInfo(list[0].locationId, list[0].locationName);
   }
 }, 60000);
 
