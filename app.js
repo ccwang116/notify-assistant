@@ -13,6 +13,7 @@ const tracksRouter = require("./routes/tracks.route");
 const stockRouter = require("./routes/stock.route");
 const weatherRouter = require("./routes/weather.route");
 const busRouter = require("./routes/bus.route");
+const constructionRouter = require("./routes/under-construction.route");
 const pushMsg = require("./routes/push-msg.route");
 const mockData = require("./db.json");
 
@@ -23,36 +24,36 @@ const { getBusInfo } = require("./controllers/bus.controller");
 app.set("views", __dirname + "/views");
 app.set("view engine", "pug");
 
-//get info every 5 secs during MON to FRI morning
-// setInterval(() => {
-//   if (
-//     // dayjs().day() > 0
-//     dayjs().day() > 0 &&
-//     dayjs().day() < 6 &&
-//     dayjs().hour() > 8 &&
-//     dayjs().hour() < 14
-//   ) {
-//     console.log("Wait for 5 second...");
-//     const list = mockData.tracks;
-//     console.log(list);
-//     for (let i = 0; i < list.length; i++) {
-//       const element = list[i];
-//       getStockInfo(element.stockId, element.tracePrice);
-//     }
-//   }
-// }, 5000);
+// get info every 5 secs during MON to FRI morning
+setInterval(() => {
+  if (
+    // dayjs().day() > 0
+    dayjs().day() > 0 &&
+    dayjs().day() < 6 &&
+    dayjs().hour() > 8 &&
+    dayjs().hour() < 14
+  ) {
+    console.log("Wait for 5 second...");
+    const list = mockData.tracks;
+    console.log(list);
+    for (let i = 0; i < list.length; i++) {
+      const element = list[i];
+      getStockInfo(element.stockId, element.tracePrice);
+    }
+  }
+}, 5000);
 
-// setInterval(() => {
-//   const timeNow = dayjs().format("HH:mm");
-//   if (timeNow === "08:20" || timeNow === "08:25") {
-//     const list = mockData.bus;
-//     getBusInfo(list[0].routeId, list[0].stopId);
-//   }
-//   if (timeNow === "08:05") {
-//     const list = mockData.weather;
-//     getWeatherInfo(list[0].locationId, list[0].locationName);
-//   }
-// }, 60000);
+setInterval(() => {
+  const timeNow = dayjs().format("HH:mm");
+  if (timeNow === "08:20" || timeNow === "08:25") {
+    const list = mockData.bus;
+    getBusInfo(list[0].routeId, list[0].stopId);
+  }
+  if (timeNow === "08:05") {
+    const list = mockData.weather;
+    getWeatherInfo(list[0].locationId, list[0].locationName);
+  }
+}, 60000);
 
 app.use(bodyParser.json());
 app.use(
@@ -71,13 +72,17 @@ app.get("/", (req, res) => {
     ],
   });
 });
-app.use("/stock", stockRouter);
+// app.use("/stock", stockRouter);
+app.use("/stock", constructionRouter);
 
-app.use("/tracks", tracksRouter);
+// app.use("/tracks", tracksRouter);
+app.use("/tracks", constructionRouter);
 
-app.use("/weather", weatherRouter);
+// app.use("/weather", weatherRouter);
+app.use("/weather", constructionRouter);
 
-app.use("/bus", busRouter);
+// app.use("/bus", busRouter);
+app.use("/bus", constructionRouter);
 
 app.use("/push", pushMsg);
 
