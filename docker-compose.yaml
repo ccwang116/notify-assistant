@@ -1,9 +1,0 @@
-version: "3"
-
-services:
-  app:
-    container_name: notify-assistant
-    build: .
-    restart: always
-    ports:
-      - "${APP_PORT}:${APP_PORT}"
