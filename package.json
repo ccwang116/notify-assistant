@@ -8,6 +8,9 @@
     "json-server": "^0.17.2",
     "pug": "^3.0.2"
   },
+  "engines": {
+    "node": "14.x"
+  },
   "scripts": {
     "start": "node app.js",
     "server": "json-server --watch db.json --port 5000"
