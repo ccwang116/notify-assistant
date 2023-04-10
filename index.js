@@ -13,6 +13,7 @@ const tracksRouter = require("./routes/tracks.route");
 const stockRouter = require("./routes/stock.route");
 const weatherRouter = require("./routes/weather.route");
 const busRouter = require("./routes/bus.route");
+const dailyRouter = require("./routes/daily.route");
 const constructionRouter = require("./routes/under-construction.route");
 const pushMsg = require("./routes/push-msg.route");
 const mockData = require("./db.json");
@@ -83,6 +84,8 @@ app.use("/weather", constructionRouter);
 
 // app.use("/bus", busRouter);
 app.use("/bus", constructionRouter);
+
+app.use("/daily", dailyRouter);
 
 app.use("/push", pushMsg);
 

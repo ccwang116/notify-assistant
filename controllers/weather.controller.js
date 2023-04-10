@@ -28,8 +28,8 @@ const getWeatherInfo = (locationId, locationName) => {
       const contentList =
         response.data.records.locations[0].location[0].weatherElement;
       const PoP12h = getValue(contentList, "PoP12h");
-      const MinT = getValueOfThreeIdx(contentList, "T");
-      const MaxT = getValue(contentList, "T");
+      const MinT = getValue(contentList, "MinT") || getValue(contentList, "T");
+      const MaxT = getValue(contentList, "MaxT") || getValue(contentList, "T");
       const description = getValue(contentList, "WeatherDescription");
       //makeNotify(`${locationName}天氣:\n${description}`);
       let stickerIdx = "0";
