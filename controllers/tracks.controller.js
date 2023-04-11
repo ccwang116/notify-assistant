@@ -111,26 +111,27 @@ const handleMatchPrice = (price, tracePrice, stockName, traceLog) => {
 };
 //only notify when last notification is over 30 minutes
 let traceLog = {};
-const getStockInfo = (stockId, tracePriceList) => {
-  axios
-    .get(
-      `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockId}.tw&json=1&delay=0`
-    )
-    .then((response) => {
-      const targetStock = response.data.msgArray
-        ? response.data.msgArray[0]
-        : null;
-      const stockName = targetStock ? targetStock.n : "無資料";
-      const price = targetStock ? +targetStock.z : 0;
-      console.log(stockName, price);
-      tracePriceList.forEach((tracePrice) => {
-        handleMatchPrice(price, tracePrice, stockName, traceLog);
-      });
-      // console.log("traceLog", traceLog);
-    })
-    .catch((error) => {
-      console.error(error);
+const getStockInfo = async (stockId, tracePriceList) => {
+  const response = await axios.get(
+    `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockId}.tw&json=1&delay=0`
+  );
+
+  if (response.status === 200) {
+    const targetStock = response.data.msgArray
+      ? response.data.msgArray[0]
+      : null;
+    const stockName = targetStock ? targetStock.n : "無資料";
+    const price = targetStock ? +targetStock.z : 0;
+    console.log(stockName, price);
+    tracePriceList.forEach((tracePrice) => {
+      handleMatchPrice(price, tracePrice, stockName, traceLog);
     });
+    // console.log("traceLog", traceLog);
+    return { status: response.status, message: { stockName, price } };
+  } else {
+    console.error(response);
+    return { status: response.status, message: response };
+  }
 };
 const notifyTotal = (stockList) => {
   let totalQuery = "";
