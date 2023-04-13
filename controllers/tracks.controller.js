@@ -112,11 +112,9 @@ const handleMatchPrice = (price, tracePrice, stockName, traceLog) => {
 //only notify when last notification is over 30 minutes
 let traceLog = {};
 const getStockInfo = async (stockId, tracePriceList) => {
-  const response = await axios.get(
-    `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockId}.tw&json=1&delay=0`
-  );
-
-  if (response.status === 200) {
+  const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_${stockId}.tw&json=1&delay=0`;
+  try {
+    const response = await axios.get(url);
     const targetStock = response.data.msgArray
       ? response.data.msgArray[0]
       : null;
@@ -128,11 +126,12 @@ const getStockInfo = async (stockId, tracePriceList) => {
     });
     // console.log("traceLog", traceLog);
     return { status: response.status, message: { stockName, price } };
-  } else {
-    console.error(response);
-    return { status: response.status, message: response };
+  } catch (error) {
+    console.error(error);
+    return { status: error.status, message: error };
   }
 };
+
 const notifyTotal = (stockList) => {
   let totalQuery = "";
   for (let i = 0; i < stockList.tracks.length; i++) {

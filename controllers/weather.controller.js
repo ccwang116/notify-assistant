@@ -10,19 +10,13 @@ const getWeatherInfo = async (locationId, locationName) => {
     return list.find((e) => e.elementName === key)?.time[0]?.elementValue[0]
       .value;
   };
-  const getValueOfThreeIdx = (list, key) => {
-    return list.find((e) => e.elementName === key)?.time[3]?.elementValue[0]
-      .value;
-  };
-  const response = await axios.get(
-    `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
-      process.env["CWB_AUTHORIZATION"]
-    }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs().format(
-      "YYYY-MM-DDT12:00:00"
-    )}`
-  );
-
-  if (response.status === 200) {
+  const url = `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
+    process.env["CWB_AUTHORIZATION"]
+  }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs().format(
+    "YYYY-MM-DDT12:00:00"
+  )}`;
+  try {
+    const response = await axios.get(url);
     const locationName =
       response.data.records.locations[0].location[0].locationName;
     const contentList =
@@ -42,15 +36,15 @@ const getWeatherInfo = async (locationId, locationName) => {
     } else if (+PoP12h >= 81 && +PoP12h < 101) {
       stickerIdx = "80";
     }
-    makeNotify(
+    await makeNotify(
       `${locationName}天氣:\n溫度${MinT}~${MaxT}度，降雨機率${PoP12h}%`,
       true,
       stickerMap[stickerIdx]
     );
     return { status: response.status, message: "" };
-  } else {
-    console.error(response);
-    return { status: response.status, message: response };
+  } catch (error) {
+    console.error(error);
+    return { status: error.status, message: error };
   }
 };
 
