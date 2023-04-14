@@ -26,15 +26,13 @@ const getBusInfo = (routeId, stopId) => {
 async function get(req, res, next) {
   try {
     const result = await bus.get();
-    if (result.status === 200) {
-      const list = result.data;
-      res.render("bus", {
-        title: "Bus page",
-        routeId: list[0].routeId,
-        stopId: list[0].stopId,
-        form_action: "/bus/edit",
-      });
-    }
+    const list = result.data;
+    res.render("bus", {
+      title: "Bus page",
+      routeId: list[0].routeId,
+      stopId: list[0].stopId,
+      form_action: "/bus/edit",
+    });
   } catch (err) {
     console.error(`Error`, err);
     next(err);
@@ -43,9 +41,7 @@ async function get(req, res, next) {
 async function edit(req, res, next) {
   try {
     const result = await bus.edit(req.body);
-    if (result.status === 200) {
-      res.redirect("/bus");
-    }
+    res.redirect("/bus");
   } catch (err) {
     console.error(`Error`, err);
     next(err);
