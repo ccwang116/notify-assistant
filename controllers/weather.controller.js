@@ -13,7 +13,7 @@ const getWeatherInfo = async (locationId, locationName) => {
   const url = `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
     process.env["CWB_AUTHORIZATION"]
   }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs().format(
-    "YYYY-MM-DDT12:00:00"
+    "YYYY-MM-DDT06:00:00"
   )}`;
   try {
     const response = await axios.get(url);
@@ -51,15 +51,13 @@ const getWeatherInfo = async (locationId, locationName) => {
 async function get(req, res, next) {
   try {
     const result = await weather.get();
-    if (result.status === 200) {
-      const list = result.data;
-      res.render("weather", {
-        title: "Weather page",
-        locationId: list[0].locationId,
-        currentLocation: list[0].locationName,
-        form_action: "/weather/edit",
-      });
-    }
+    const list = result.data;
+    res.render("weather", {
+      title: "Weather page",
+      locationId: list[0].locationId,
+      currentLocation: list[0].locationName,
+      form_action: "/weather/edit",
+    });
   } catch (err) {
     console.error(`Error`, err);
     next(err);
@@ -67,10 +65,8 @@ async function get(req, res, next) {
 }
 async function edit(req, res, next) {
   try {
-    const result = await weather.edit(req.body);
-    if (result.status === 200) {
-      res.redirect("/weather");
-    }
+    await weather.edit(req.body);
+    res.redirect("/weather");
   } catch (err) {
     console.error(`Error`, err);
     next(err);
