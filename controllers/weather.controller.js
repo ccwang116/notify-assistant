@@ -41,7 +41,7 @@ const getWeatherInfo = async (locationId, locationName) => {
       true,
       stickerMap[stickerIdx]
     );
-    return { status: response.status, message: "" };
+    return { status: response.status, message: contentList };
   } catch (error) {
     console.error(error);
     return { status: error.status, message: error };
