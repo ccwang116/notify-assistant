@@ -21,6 +21,20 @@
       "tracePrice": [
         35
       ]
+    },
+    {
+      "stockId": "2498",
+      "tracePrice": [
+        60
+      ],
+      "id": 4
+    },
+    {
+      "stockId": "6756",
+      "tracePrice": [
+        221
+      ],
+      "id": 5
     }
   ],
   "weather": [

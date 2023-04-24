@@ -1,3 +1,4 @@
+require("dotenv").config();
 const dayjs = require("dayjs");
 const tracks = require("../services/tracks.service");
 const axios = require("axios");
@@ -111,7 +112,11 @@ const getStockInfo = async (stockId, tracePriceList) => {
       ? response.data.msgArray[0]
       : null;
     const stockName = targetStock ? targetStock.n : "無資料";
-    const price = targetStock ? +targetStock.z : 0;
+    const price = targetStock
+      ? process.env["NODE_ENV"] === "development"
+        ? +targetStock.z
+        : +targetStock.o
+      : 0;
     console.log(stockName, price);
     tracePriceList.forEach((tracePrice) => {
       handleMatchPrice(price, tracePrice, stockName, traceLog);
