@@ -15,6 +15,7 @@ router.get("/weather", async (req, res, next) => {
       message: "Send Success!",
       data: list,
     });
+    console.log(result);
   } else {
     res.status(result.status).json({
       message: result.message,

@@ -1,9 +1,12 @@
 const axios = require("axios");
 const dayjs = require("dayjs");
-
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
 const makeNotify = require("./notify.controller");
 const stickerMap = require("../weather-sticker.json");
 const weather = require("../services/weather.service");
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const getWeatherInfo = async (locationId, locationName) => {
   const getValue = (list, key) => {
@@ -12,9 +15,9 @@ const getWeatherInfo = async (locationId, locationName) => {
   };
   const url = `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
     process.env["CWB_AUTHORIZATION"]
-  }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs().format(
-    "YYYY-MM-DDT06:00:00"
-  )}`;
+  }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs()
+    .tz("Asia/Taipei")
+    .format("YYYY-MM-DDT06:00:00")}`;
   try {
     const response = await axios.get(url);
     const locationName =
@@ -41,7 +44,7 @@ const getWeatherInfo = async (locationId, locationName) => {
       true,
       stickerMap[stickerIdx]
     );
-    return { status: response.status, message: "" };
+    return { status: response.status, message: contentList };
   } catch (error) {
     console.error(error);
     return { status: error.status, message: error };
