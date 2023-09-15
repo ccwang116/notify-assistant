@@ -13,7 +13,7 @@ const getWeatherInfo = async (locationId, locationName) => {
     return list.find((e) => e.elementName === key)?.time[0]?.elementValue[0]
       .value;
   };
-  const url = `https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
+  const url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
     process.env["CWB_AUTHORIZATION"]
   }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs()
     .tz("Asia/Taipei")
