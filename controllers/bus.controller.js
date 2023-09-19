@@ -14,13 +14,15 @@ const getBusInfo = (routeId, stopId) => {
       const infoList = stop.n1.split(",");
       const count = Math.floor(infoList[7] / 60);
       if (count === -1) {
-        makeNotify(`243公車文化里無資訊`);
+        makeNotify(`橘5公車景安站無資訊`);
       } else {
-        makeNotify(`公車資訊\n243公車還有 ${count} 分鐘抵達文化里`);
+        makeNotify(`公車資訊\n橘5公車還有 ${count} 分鐘抵達景安站`);
       }
+      return { status: response.status, message: "OK" };
     })
     .catch((error) => {
       console.error(error);
+      return { status: error.status, message: error };
     });
 };
 async function get(req, res, next) {

@@ -3,6 +3,7 @@ const router = express.Router();
 const mockData = require("../db.json");
 const { getWeatherInfo } = require("../controllers/weather.controller");
 const { getStockInfo } = require("../controllers/tracks.controller");
+const { getBusInfo } = require("../controllers/bus.controller");
 
 router.get("/", (req, res, next) => {
   res.send("OK");
@@ -44,6 +45,24 @@ router.get("/stock", async (req, res, next) => {
       data: recordList,
     });
   }
+});
+router.get("/bus", async (req, res, next) => {
+  const list = mockData.bus;
+  console.log(list);
+  const element = list[0];
+  getBusInfo(element.routeId, element.stopId);
+  // if (result.status === 200) {
+  //   res.status(200).json({
+  //     message: "Send Success!",
+  //     data: list,
+  //   });
+  //   console.log(result);
+  // } else {
+  //   res.status(result.status).json({
+  //     message: result.message,
+  //     data: list,
+  //   });
+  // }
 });
 
 module.exports = router;

@@ -17,7 +17,7 @@
     },
     {
       "stockId": "00878",
-      "tracePrice": [19, 20],
+      "tracePrice": [],
       "id": 7
     }
   ],
@@ -31,8 +31,8 @@
   "bus": [
     {
       "id": 1,
-      "routeId": 10172,
-      "stopId": 34528
+      "routeId": 16405,
+      "stopId": 122402
     }
   ]
 }
