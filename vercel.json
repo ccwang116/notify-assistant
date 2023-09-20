@@ -14,10 +14,6 @@
   ],
   "crons": [
     {
-      "path": "/daily/weather",
-      "schedule": "0 23 * * *"
-    },
-    {
       "path": "/daily/stock",
       "schedule": "0 1 * * 1-5"
     },
