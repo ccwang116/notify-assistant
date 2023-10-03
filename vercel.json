@@ -18,8 +18,8 @@
       "schedule": "0 1 * * 1-5"
     },
     {
-      "path": "/daily/bus",
-      "schedule": "0 22 * * 1-5"
+      "path": "/daily/weather",
+      "schedule": "0 23 * * *"
     }
   ]
 }

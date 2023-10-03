@@ -51,9 +51,6 @@ router.get("/bus", async (req, res, next) => {
   console.log(list);
   const element = list[0];
   getBusInfo(element.routeId, element.stopId);
-  //get Weather Info at the same time
-  const weatherList = mockData.weather;
-  getWeatherInfo(weatherList[0].locationId, weatherList[0].locationName);
   // if (result.status === 200) {
   //   res.status(200).json({
   //     message: "Send Success!",
