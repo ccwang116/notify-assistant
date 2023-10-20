@@ -7,12 +7,12 @@
     },
     {
       "stockId": "6756",
-      "tracePrice": [199, 201, 202],
+      "tracePrice": [210, 209],
       "id": 5
     },
     {
       "stockId": "2388",
-      "tracePrice": [103, 104],
+      "tracePrice": [103, 104, 108],
       "id": 6
     },
     {
