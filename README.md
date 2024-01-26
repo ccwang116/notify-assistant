@@ -1,6 +1,7 @@
 # notify-assistant
 
-This project offers free stock tracking, weather forecast and bus tracking. User will receive notifications which is provided by [LINE Notify](https://notify-bot.line.me/)
+This project offers free stock tracking, weather forecast and bus tracking. User will receive notifications which is provided by [LINE Notify](https://notify-bot.line.me/)\
+<img width="500" alt="Project_screenshot" src="https://raw.githubusercontent.com/ccwang116/notify-assistant/main/public/LineNotify_screenshot.png">
 
 ## Start the app
 
