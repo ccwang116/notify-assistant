@@ -3,16 +3,24 @@
     {
       "id": 3,
       "stockId": "2886",
-      "tracePrice": [41]
+      "tracePrice": [
+        37
+      ]
     },
     {
       "stockId": "6756",
-      "tracePrice": [210, 209],
+      "tracePrice": [
+        240
+      ],
       "id": 5
     },
     {
       "stockId": "2388",
-      "tracePrice": [103, 104, 108],
+      "tracePrice": [
+        150,
+        153,
+        160
+      ],
       "id": 6
     },
     {
