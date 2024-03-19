@@ -88,14 +88,20 @@ async function remove(req, res, next) {
   }
 }
 
-const handleMatchPrice = (price, tracePrice, stockName, traceLog) => {
+const handleMatchPrice = (
+  price,
+  tracePrice,
+  stockName,
+  traceLog,
+  priceDiff
+) => {
   if (price >= tracePrice && price < tracePrice + 1) {
     if (
       !traceLog[`${stockName}-${tracePrice}`] ||
       dayjs().diff(traceLog[`${stockName}-${tracePrice}`], "m") > 30
     ) {
       // console.log(`台股報價\n${stockName}: ${price}`);
-      makeNotify(`台股報價\n${stockName}: ${price}`);
+      makeNotify(`台股報價\n${stockName}: ${price},漲跌幅${priceDiff}%`);
       traceLog[`${stockName}-${tracePrice}`] = dayjs().format(
         "YYYY/MM/DD HH:mm:ss"
       );
@@ -117,9 +123,14 @@ const getStockInfo = async (stockId, tracePriceList) => {
         ? +targetStock.z
         : +targetStock.o
       : 0;
+    const priceDiff = targetStock
+      ? process.env["NODE_ENV"] === "development"
+        ? ((+targetStock.z - +targetStock.y) / +targetStock.y) * 100
+        : +targetStock.o
+      : 0;
     console.log(stockName, price);
     tracePriceList.forEach((tracePrice) => {
-      handleMatchPrice(price, tracePrice, stockName, traceLog);
+      handleMatchPrice(price, tracePrice, stockName, traceLog, priceDiff);
     });
     // console.log("traceLog", traceLog);
     return { status: response.status, message: { stockName, price } };
