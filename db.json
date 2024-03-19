@@ -8,25 +8,27 @@
       ]
     },
     {
-      "stockId": "6756",
+      "stockId": "3702",
       "tracePrice": [
-        240
+        95
       ],
-      "id": 5
+      "id": 8
     },
     {
-      "stockId": "2388",
+      "stockId": "3289",
       "tracePrice": [
-        150,
-        153,
-        160
+        132,
+        137
       ],
-      "id": 6
+      "id": 9
     },
     {
-      "stockId": "00878",
-      "tracePrice": [],
-      "id": 7
+      "stockId": "2357",
+      "tracePrice": [
+        459,
+        465
+      ],
+      "id": 10
     }
   ],
   "weather": [
