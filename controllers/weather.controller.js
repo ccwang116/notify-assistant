@@ -20,6 +20,13 @@ const getWeatherInfo = async (locationId, locationName) => {
     .format("YYYY-MM-DDT06:00:00")}`;
   try {
     const response = await axios.get(url);
+    const success = response.data.success;
+    if (success !== "true") {
+      await makeNotify(
+        `No weather data, ${response.status + "," + response.message}`
+      );
+      return { status: response.status, message: response.message };
+    }
     const locationName =
       response.data.records.locations[0].location[0].locationName;
     const contentList =
@@ -47,6 +54,7 @@ const getWeatherInfo = async (locationId, locationName) => {
     return { status: response.status, message: contentList };
   } catch (error) {
     console.error(error);
+    await makeNotify(`天氣error, ${error.status},${error.message}`);
     return { status: error.status, message: error };
   }
 };
