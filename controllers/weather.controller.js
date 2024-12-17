@@ -9,13 +9,14 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const getWeatherInfo = async (locationId, locationName) => {
-  const getValue = (list, key) => {
-    return list.find((e) => e.elementName === key)?.time[0]?.elementValue[0]
-      .value;
+  const getValue = (list, key, valueKey) => {
+    return list.find((e) => e.ElementName === key)?.Time[0]?.ElementValue[0][
+      valueKey
+    ];
   };
   const url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-093?Authorization=${
     process.env["CWB_AUTHORIZATION"]
-  }&locationId=${locationId}&locationName=${locationName}&startTime=${dayjs()
+  }&locationId=${locationId}&LocationName=${locationName}&startTime=${dayjs()
     .tz("Asia/Taipei")
     .format("YYYY-MM-DDT06:00:00")}`;
   try {
@@ -28,13 +29,21 @@ const getWeatherInfo = async (locationId, locationName) => {
       return { status: response.status, message: response.message };
     }
     const locationName =
-      response.data.records.locations[0].location[0].locationName;
+      response.data.records.Locations[0].Location[0].LocationName;
     const contentList =
-      response.data.records.locations[0].location[0].weatherElement;
-    const PoP12h = getValue(contentList, "PoP12h");
-    const MinT = getValue(contentList, "MinT") || getValue(contentList, "T");
-    const MaxT = getValue(contentList, "MaxT") || getValue(contentList, "T");
-    const description = getValue(contentList, "WeatherDescription");
+      response.data.records.Locations[0].Location[0].WeatherElement;
+    const PoP12h = getValue(
+      contentList,
+      "12小時降雨機率",
+      "ProbabilityOfPrecipitation"
+    );
+    const MinT =
+      getValue(contentList, "最低溫度", "MinTemperature") ||
+      getValue(contentList, "平均溫度", "Temperature");
+    const MaxT =
+      getValue(contentList, "最高溫度", "MaxTemperature") ||
+      getValue(contentList, "平均溫度", "Temperature");
+    const description = getValue(contentList, "WeatherDescription", "");
     //makeNotify(`${locationName}天氣:\n${description}`);
     let stickerIdx = "0";
     if (+PoP12h >= 0 && +PoP12h < 31) {
