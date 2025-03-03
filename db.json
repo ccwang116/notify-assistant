@@ -2,33 +2,8 @@
   "tracks": [
     {
       "id": 3,
-      "stockId": "2886",
-      "tracePrice": [
-        37
-      ]
-    },
-    {
-      "stockId": "3702",
-      "tracePrice": [
-        95
-      ],
-      "id": 8
-    },
-    {
-      "stockId": "3289",
-      "tracePrice": [
-        132,
-        137
-      ],
-      "id": 9
-    },
-    {
-      "stockId": "2357",
-      "tracePrice": [
-        459,
-        465
-      ],
-      "id": 10
+      "stockId": "2330",
+      "tracePrice": [1000]
     }
   ],
   "weather": [
