@@ -5,11 +5,13 @@ const webhook_url = "https://api.line.me/v2/bot/message/push";
 
 const oauthToken = process.env["LINE_NOTIFY_OAUTHTOKEN_ME"];
 
-const userId = "Uc4f6f41cfd8c215cf3df4d2f08d68847"
+const userIdList = [
+  "Uc4f6f41cfd8c215cf3df4d2f08d68847",
+  "U6212c0c4e71fe293f684136a14fa1958",
+];
 
 const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
   const data = {
-    // to: userId,
     messages: [
       {
         type: "text",
@@ -32,17 +34,24 @@ const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
       },
     ];
   }
-  try {
-    const result = await axios.post(webhook_url, data, {
-      headers: {
-        "content-type": "application/json",
-        Authorization: "Bearer " + oauthToken,
-      },
-    });
-    console.log(`已發送提醒，message: ${result.data.message}`);
-  } catch (error) {
-    console.error(error);
-  }
+  const process = [];
+  userIdList.forEach((user) => {
+    let sendData = data;
+    sendData.to = user;
+    process.push(
+      axios.post(webhook_url, sendData, {
+        headers: {
+          "content-type": "application/json",
+          Authorization: "Bearer " + oauthToken,
+        },
+      })
+    );
+  });
+  Promise.all(process)
+    .then(() => {
+      console.log(`已發送提醒`);
+    })
+    .catch((error) => console.error(error));
 };
 
 module.exports = makeNotify;
