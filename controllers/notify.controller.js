@@ -9,7 +9,7 @@ const userId = "Uc4f6f41cfd8c215cf3df4d2f08d68847"
 
 const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
   const data = {
-    to: userId,
+    // to: userId,
     messages: [
       {
         type: "text",
