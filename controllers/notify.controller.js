@@ -47,9 +47,20 @@ const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
       })
     );
   });
-  Promise.all(process)
+  let holdDoor = true;
+  let ps = () => {
+    setTimeout(function () {
+      console.log("status:", proms);
+      if (holdDoor) ps();
+    }, 500);
+  };
+  ps();
+
+  return Promise.all(process)
     .then(() => {
+      holdDoor = false;
       console.log(`已發送提醒`);
+      return times.filter((t) => t.ttl != null);
     })
     .catch((error) => console.error(error));
 };
