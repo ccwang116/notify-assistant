@@ -50,7 +50,7 @@ const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
   let holdDoor = true;
   let ps = () => {
     setTimeout(function () {
-      console.log("status:", proms);
+      console.log("status:", process);
       if (holdDoor) ps();
     }, 500);
   };
