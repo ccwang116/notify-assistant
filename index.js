@@ -19,7 +19,10 @@ const pushMsg = require("./routes/push-msg.route");
 const mockData = require("./db.json");
 
 const { getStockInfo } = require("./controllers/tracks.controller");
-const { getWeatherInfo } = require("./controllers/weather.controller");
+const {
+  getWeatherInfo,
+  getWeatherInfoReply,
+} = require("./controllers/weather.controller");
 const { getBusInfo, getBusInfoReply } = require("./controllers/bus.controller");
 
 app.set("views", __dirname + "/views");
@@ -91,6 +94,7 @@ app.use("/push", pushMsg);
 
 app.use("/login/line_notify", lineNotifyRouter);
 app.post("/webhook", async (req, res) => {
+  res.sendStatus(200);
   const list = mockData.bus;
   const element = list[0];
   const events = req.body.events;
@@ -107,13 +111,15 @@ app.post("/webhook", async (req, res) => {
         );
       } else if (text === "天氣") {
         const list = mockData.weather;
-        getWeatherInfo(list[0].locationId, list[0].locationName);
+        getWeatherInfoReply(
+          event.replyToken,
+          list[0].locationId,
+          list[0].locationName,
+        );
       } else {
       }
     }
   }
-
-  res.sendStatus(200);
 });
 app.get("/callback", async function (req, res, next) {
   axios
