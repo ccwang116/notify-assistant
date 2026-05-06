@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const mockData = require("../db.json");
-const { getWeatherInfo } = require("../controllers/weather.controller");
+const {
+  getWeatherInfo,
+  getWeatherTomorrowInfo,
+} = require("../controllers/weather.controller");
 const { getStockInfo } = require("../controllers/tracks.controller");
 const { getBusInfo } = require("../controllers/bus.controller");
 
@@ -11,6 +14,24 @@ router.get("/", (req, res, next) => {
 router.get("/weather", async (req, res, next) => {
   const list = mockData.weather;
   const result = await getWeatherInfo(list[0].locationId, list[0].locationName);
+  if (result.status === 200) {
+    res.status(200).json({
+      message: "Send Success!",
+      data: list,
+    });
+    console.log(result);
+  } else {
+    res.status(result.status).json({
+      message: result.message,
+      data: list,
+    });
+  }
+});
+router.get("/weather_tomorrow", async (req, res, next) => {
+  const list = mockData.weather;
+  const result = await getWeatherTomorrowInfo(
+    list[0].locationName,
+  );
   if (result.status === 200) {
     res.status(200).json({
       message: "Send Success!",

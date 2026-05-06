@@ -2,7 +2,7 @@ const axios = require("axios");
 const dayjs = require("dayjs");
 const utc = require("dayjs/plugin/utc");
 const timezone = require("dayjs/plugin/timezone");
-const makeNotify = require("./notify.controller");
+const { makeNotify } = require("./notify.controller");
 const stickerMap = require("../weather-sticker.json");
 const weather = require("../services/weather.service");
 dayjs.extend(utc);
@@ -24,7 +24,7 @@ const getWeatherInfo = async (locationId, locationName) => {
     const success = response.data.success;
     if (success !== "true") {
       await makeNotify(
-        `No weather data, ${response.status + "," + response.message}`
+        `No weather data, ${response.status + "," + response.message}`,
       );
       return { status: response.status, message: response.message };
     }
@@ -35,7 +35,7 @@ const getWeatherInfo = async (locationId, locationName) => {
     const PoP12h = getValue(
       contentList,
       "12小時降雨機率",
-      "ProbabilityOfPrecipitation"
+      "ProbabilityOfPrecipitation",
     );
     const MinT =
       getValue(contentList, "最低溫度", "MinTemperature") ||
@@ -58,8 +58,51 @@ const getWeatherInfo = async (locationId, locationName) => {
     await makeNotify(
       `${locationName}天氣:\n溫度${MinT}~${MaxT}度，降雨機率${PoP12h}%`,
       true,
-      stickerMap[stickerIdx]
+      stickerMap[stickerIdx],
     );
+    return { status: response.status, message: contentList };
+  } catch (error) {
+    console.error(error);
+    await makeNotify(`天氣error, ${error.status},${error.message}`);
+    return { status: error.status, message: error };
+  }
+};
+const getWeatherTomorrowInfo = async (locationName) => {
+  const getValue = (list, key, valueKey) => {
+    return list.find((e) => e.ElementName === key)?.Time[0]?.ElementValue[0][
+      valueKey
+    ];
+  };
+  const url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-069?Authorization=${
+    process.env["CWB_AUTHORIZATION"]
+  }&LocationName=${locationName}&ElementName=%E5%A4%A9%E6%B0%A3%E9%A0%90%E5%A0%B1%E7%B6%9C%E5%90%88%E6%8F%8F%E8%BF%B0&StartTime=${dayjs()
+    .add(1, "day")
+    .tz("Asia/Taipei")
+    .format("YYYY-MM-DDT09:00:00")}`;
+  try {
+    const response = await axios.get(url);
+    const success = response.data.success;
+    if (success !== "true") {
+      await makeNotify(
+        `No weather data, ${response.status + "," + response.message}`,
+      );
+      return { status: response.status, message: response.message };
+    }
+    const locationName =
+      response.data.records.Locations[0].Location[0].LocationName;
+    const startTime = dayjs(
+      response.data.records.Locations[0].Location[0].WeatherElement[0].Time[0]
+        .StartTime,
+    ).format("YYYY-MM-DD");
+    const contentList =
+      response.data.records.Locations[0].Location[0].WeatherElement;
+    const WeatherDescription = getValue(
+      contentList,
+      "天氣預報綜合描述",
+      "WeatherDescription",
+    );
+
+    await makeNotify(`${startTime}${locationName}天氣:\n${WeatherDescription}`);
     return { status: response.status, message: contentList };
   } catch (error) {
     console.error(error);
@@ -107,4 +150,5 @@ module.exports = {
   edit,
   notify,
   getWeatherInfo,
+  getWeatherTomorrowInfo,
 };
