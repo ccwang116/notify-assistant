@@ -6,8 +6,8 @@ const webhook_url = "https://api.line.me/v2/bot/message/push";
 const oauthToken = process.env["LINE_NOTIFY_OAUTHTOKEN_ME"];
 
 const userIdList = [
-  "Uc4f6f41cfd8c215cf3df4d2f08d68847",
-  "U6212c0c4e71fe293f684136a14fa1958",
+  "Uc4f6f41cfd8c215cf3df4d2f08d68847",//me
+  // "U6212c0c4e71fe293f684136a14fa1958",
 ];
 
 const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
