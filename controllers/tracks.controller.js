@@ -2,7 +2,7 @@ require("dotenv").config();
 const dayjs = require("dayjs");
 const tracks = require("../services/tracks.service");
 const axios = require("axios");
-const makeNotify = require("./notify.controller");
+const { makeNotify } = require("./notify.controller");
 
 async function get(req, res, next) {
   try {

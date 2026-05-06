@@ -20,7 +20,7 @@ const mockData = require("./db.json");
 
 const { getStockInfo } = require("./controllers/tracks.controller");
 const { getWeatherInfo } = require("./controllers/weather.controller");
-const { getBusInfo } = require("./controllers/bus.controller");
+const { getBusInfo, getBusInfoReply } = require("./controllers/bus.controller");
 
 app.set("views", __dirname + "/views");
 app.set("view engine", "pug");
@@ -60,7 +60,7 @@ app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
-  })
+  }),
 );
 
 app.get("/", (req, res) => {
@@ -90,11 +90,35 @@ app.use("/daily", dailyRouter);
 app.use("/push", pushMsg);
 
 app.use("/login/line_notify", lineNotifyRouter);
+app.post("/webhook", async (req, res) => {
+  const list = mockData.bus;
+  const element = list[0];
+  const events = req.body.events;
 
+  for (const event of events) {
+    if (event.type === "message" && event.message.type === "text") {
+      const text = event.message.text;
+
+      if (text === "公車") {
+        await getBusInfoReply(
+          event.replyToken,
+          element.routeId,
+          element.stopId,
+        );
+      } else if (text === "天氣") {
+        const list = mockData.weather;
+        getWeatherInfo(list[0].locationId, list[0].locationName);
+      } else {
+      }
+    }
+  }
+
+  res.sendStatus(200);
+});
 app.get("/callback", async function (req, res, next) {
   axios
     .post(
-      `https://notify-bot.line.me/oauth/token?grant_type=authorization_code&code=${req.query.code}&redirect_uri=${process.env["LINE_NOTIFY_CALLBACK_URL"]}&client_id=${process.env["LINE_NOTIFY_CLIENT_ID"]}&client_secret=${process.env["LINE_NOTIFY_CLIENT_SECRET"]}`
+      `https://notify-bot.line.me/oauth/token?grant_type=authorization_code&code=${req.query.code}&redirect_uri=${process.env["LINE_NOTIFY_CALLBACK_URL"]}&client_id=${process.env["LINE_NOTIFY_CLIENT_ID"]}&client_secret=${process.env["LINE_NOTIFY_CLIENT_SECRET"]}`,
     )
     .then((res) => {
       console.log(res);

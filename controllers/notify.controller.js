@@ -44,7 +44,7 @@ const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
           "content-type": "application/json",
           Authorization: "Bearer " + oauthToken,
         },
-      })
+      }),
     );
   });
   let holdDoor = true;
@@ -64,4 +64,19 @@ const makeNotify = async (text, isSticker = false, stickerId = [0, 0]) => {
     .catch((error) => console.error(error));
 };
 
-module.exports = makeNotify;
+async function reply(token, text) {
+  await axios.post(
+    "https://api.line.me/v2/bot/message/reply",
+    {
+      replyToken: token,
+      messages: [{ type: "text", text }],
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${oauthToken}`,
+      },
+    },
+  );
+}
+
+module.exports = { makeNotify, reply };
