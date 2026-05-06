@@ -95,31 +95,33 @@ app.use("/push", pushMsg);
 app.use("/login/line_notify", lineNotifyRouter);
 app.post("/webhook", async (req, res) => {
   res.sendStatus(200);
-  const list = mockData.bus;
-  const element = list[0];
-  const events = req.body.events;
+  setImmediate(async () => {
+    const list = mockData.bus;
+    const element = list[0];
+    const events = req.body.events;
 
-  for (const event of events) {
-    if (event.type === "message" && event.message.type === "text") {
-      const text = event.message.text;
+    for (const event of events) {
+      if (event.type === "message" && event.message.type === "text") {
+        const text = event.message.text;
 
-      if (text === "公車") {
-        await getBusInfoReply(
-          event.replyToken,
-          element.routeId,
-          element.stopId,
-        );
-      } else if (text === "天氣") {
-        const list = mockData.weather;
-        getWeatherInfoReply(
-          event.replyToken,
-          list[0].locationId,
-          list[0].locationName,
-        );
-      } else {
+        if (text === "公車") {
+          await getBusInfoReply(
+            event.replyToken,
+            element.routeId,
+            element.stopId,
+          );
+        } else if (text === "天氣") {
+          const list = mockData.weather;
+          getWeatherInfoReply(
+            event.replyToken,
+            list[0].locationId,
+            list[0].locationName,
+          );
+        } else {
+        }
       }
     }
-  }
+  });
 });
 app.get("/callback", async function (req, res, next) {
   axios
