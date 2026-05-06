@@ -4,7 +4,7 @@ const dayjs = require("dayjs");
 const { makeNotify, reply } = require("./notify.controller");
 const bus = require("../services/bus.service");
 
-const getBusInfo = (routeId, stopId) => {
+const getBusInfo = (routeId, stopId,busName="指定號碼",stopName="指定的站") => {
   axios
     .get(
       `https://pda.5284.gov.taipei/MQS/RouteDyna?routeid=${routeId}&nocache=${dayjs().valueOf()}`,
@@ -14,9 +14,9 @@ const getBusInfo = (routeId, stopId) => {
       const infoList = stop.n1.split(",");
       const count = Math.floor(infoList[7] / 60);
       if (count === -1) {
-        makeNotify(`橘5公車景安站無資訊`);
+        makeNotify(`${busName}公車${stopName}無資訊`);
       } else {
-        makeNotify(`公車資訊\n橘5公車還有 ${count} 分鐘抵達景安站`);
+        makeNotify(`公車資訊\n${busName}公車還有 ${count} 分鐘抵達${stopName}`);
       }
       return { status: response.status, message: "OK" };
     })
@@ -35,7 +35,7 @@ const getBusInfoReply = (replyToken, routeId, stopId) => {
       const infoList = stop.n1.split(",");
       const count = Math.floor(infoList[7] / 60);
       if (count === -1) {
-        reply(replyToken, `227公車景安站無資訊`);
+        reply(replyToken, `227公車台北橋站無資訊`);
       } else {
         reply(replyToken, `公車資訊\n227公車往永和方向還有 ${count} 分鐘抵達台北橋站`);
       }
@@ -72,7 +72,7 @@ async function edit(req, res, next) {
 }
 async function notify(req, res, next) {
   try {
-    getBusInfo(+req.params.routeId, +req.params.stopId);
+    getBusInfo(+req.params.routeId, +req.params.stopId,req.params.busName,req.params.stopName);
     res.redirect("/bus");
   } catch (err) {
     console.error(`Error`, err);

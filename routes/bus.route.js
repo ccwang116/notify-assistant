@@ -6,6 +6,6 @@ router.get("/", bus.get);
 //  edit
 router.post("/edit", bus.edit);
 //notify now
-router.get("/:routeId/:stopId", bus.notify);
-//trigger deploy
+router.get("/:routeId/:stopId/:busName/:stopName", bus.notify);
+
 module.exports = router;

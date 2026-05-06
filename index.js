@@ -85,8 +85,8 @@ app.use("/tracks", constructionRouter);
 // app.use("/weather", weatherRouter);
 app.use("/weather", constructionRouter);
 
-// app.use("/bus", busRouter);
-app.use("/bus", constructionRouter);
+app.use("/bus", busRouter);
+// app.use("/bus", constructionRouter);
 
 app.use("/daily", dailyRouter);
 
