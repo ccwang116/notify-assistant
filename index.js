@@ -66,16 +66,32 @@ app.use(
 );
 app.use((req, res, next) => {
   res.locals.canEdit = canEdit;
+  res.locals.currentPath = req.path;
   next();
 });
 
 app.get("/", (req, res) => {
   res.render("home", {
-    title: "Welcome!",
+    title: "歡迎回來",
     results: [
-      { title: "Stock", url: "/stock" },
-      { title: "Weather", url: "/weather" },
-      { title: "Bus", url: "/bus" },
+      {
+        title: "股票追蹤",
+        desc: "股價到達提醒價格時通知你",
+        url: "/stock",
+        icon: "chart",
+      },
+      {
+        title: "天氣",
+        desc: "每天推送所在地區的天氣預報",
+        url: "/weather",
+        icon: "cloud",
+      },
+      {
+        title: "公車",
+        desc: "查詢公車預計到站時間",
+        url: "/bus",
+        icon: "bus",
+      },
     ],
   });
 });

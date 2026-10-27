@@ -58,7 +58,7 @@ async function get(req, res, next) {
   try {
     const list = readDb().bus;
     res.render("bus", {
-      title: "Bus page",
+      title: "公車",
       routeId: list[0].routeId,
       stopId: list[0].stopId,
       form_action: "/bus/edit",

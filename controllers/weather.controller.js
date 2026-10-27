@@ -162,7 +162,7 @@ async function get(req, res, next) {
   try {
     const list = readDb().weather;
     res.render("weather", {
-      title: "Weather page",
+      title: "天氣",
       locationId: list[0].locationId,
       currentLocation: list[0].locationName,
       form_action: "/weather/edit",

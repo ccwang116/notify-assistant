@@ -1,27 +1,53 @@
 extends layout.pug
 
 block content
-  h6 Content settings：
-  .p-4.mb-3.bg-light.rounded
-    h6 Route (id) :
-      .d-flex.flex-wrap.justify-content-between.align-items-center
-        span=routeId
-        a.btn.btn-outline-primary.btn-sm.ml-1(href='https://pda.5284.gov.taipei/MQS/routelist.jsp' target="_blank") Search each route id
-    h6 Stop (id) :
-    div: span=stopId
-  if canEdit
-    form#edit-form(method="post",action=form_action)
-      .form-group
-        label(for='routeId') routeId
-        input#routeId.form-control(type='text' name='routeId' value=routeId)
-      .form-group
-        label(for='stopId') stopId
-        input#stopId.form-control(type='text' name='stopId' value=stopId)
-  else
-    include _edit-notice
-  .d-flex.flex-wrap.justify-content-center.align-items-center
-    if canEdit
-      button.btn.btn-primary.mr-2(type='submit' form='edit-form') Submit
-    a.btn.btn-outline-primary(href=`/bus/${routeId}/${stopId}`) Notify now
-    a.btn.btn-outline-primary(href=`/bus/15521/12933/227/台北橋`) 227 台北橋
-    a.btn.btn-outline-primary(href=`/bus/15521/12954/227/安平路`) 227 安平路
+  .page-head
+    h1.page-title= title
+    p.page-desc 設定要追蹤的公車路線與站牌，查詢到站時間後透過 LINE 通知你。
+
+  form.card(method="post" action=form_action)
+    .card-head
+      div
+        h2.card-title 路線設定
+        p.card-desc 立即通知與排程查詢都會使用這組設定。
+      a.link-subtle(href="https://pda.5284.gov.taipei/MQS/routelist.jsp" target="_blank" rel="noopener")
+        | 查詢路線 ID
+        +icon('external')
+    .card-body
+      if canEdit
+        .field-row
+          .field
+            label.field-label(for="routeId") 路線 ID
+            input#routeId.input(type="text" name="routeId" value=routeId inputmode="numeric" autocomplete="off" required)
+          .field
+            label.field-label(for="stopId") 站牌 ID
+            input#stopId.input(type="text" name="stopId" value=stopId inputmode="numeric" autocomplete="off" required)
+      else
+        dl.summary
+          .summary-row
+            dt 路線 ID
+            dd= routeId
+          .summary-row
+            dt 站牌 ID
+            dd= stopId
+        include _edit-notice
+    .card-foot
+      a.btn.btn-secondary(href=`/bus/${routeId}/${stopId}`)
+        +icon('send')
+        | 立即通知
+      if canEdit
+        button.btn.btn-primary(type="submit") 儲存設定
+
+  section.card
+    .card-head
+      div
+        h2.card-title 快速通知
+        p.card-desc 常用的路線與站牌，點一下就送出到站通知。
+    ul.quick-list
+      each stop in [{ stopId: 12933, name: "台北橋" }, { stopId: 12954, name: "安平路" }]
+        li
+          a.quick-item(href=`/bus/15521/${stop.stopId}/227/${stop.name}`)
+            span.quick-badge 227
+            span.quick-label= stop.name
+            span.quick-chevron
+              +icon('chevron')

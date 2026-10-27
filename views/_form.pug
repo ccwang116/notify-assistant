@@ -1,8 +1,17 @@
-form(method="post",action=form_action)
-  .form-group
-    label(for='stockId') Stock Id
-    input#stockId.form-control(type='text' name='stockId' value=initialValue.stockId)
-  .form-group
-    label(for='tracePrice') Trace Price
-    input#tracePrice.form-control(type='text' name='tracePrice' value=initialValue.tracePrice)
-  button.btn.btn-primary(type='submit') Submit
+form.card(method="post" action=form_action)
+  .card-head
+    div
+      h2.card-title 新增追蹤
+      p.card-desc 股價來到提醒價格時通知你。已追蹤的股票會加入新的提醒價格。
+  .card-body
+    .field-row
+      .field
+        label.field-label(for="stockId") 股票代號
+        input#stockId.input(type="text" name="stockId" value=initialValue.stockId placeholder="2330" inputmode="numeric" autocomplete="off" required)
+      .field
+        label.field-label(for="tracePrice") 提醒價格
+        input#tracePrice.input(type="text" name="tracePrice" value=initialValue.tracePrice placeholder="1000" inputmode="decimal" autocomplete="off" required)
+  .card-foot
+    button.btn.btn-primary(type="submit")
+      +icon('plus')
+      | 新增追蹤

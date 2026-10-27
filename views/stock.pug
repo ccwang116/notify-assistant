@@ -1,26 +1,49 @@
 extends layout.pug
 
 block content
+  .page-head
+    h1.page-title= title
+    p.page-desc 追蹤台股價格，到達提醒價格時透過 LINE 通知你。
+
   if canEdit
     include _form
   else
     include _edit-notice
-  .list-group.w-auto
-    each row in results
-      .list-group-item.list-group-item-action.d-flex.gap-3.py-3
-        .d-flex.gap-2.w-100.justify-content-between
-          div
-            h6.mb-3=row.stockId
-            each price in row.tracePrice
-                span.badge.badge-secondary.badge-pill.mr-2.mb-3=price
-                    if canEdit
-                      span.badge.badge-pill.ml-1: a(href=`/tracks/${row.id}/delete/${price}/${row.tracePrice.join("_")}`) X
+
+  section.card
+    .card-head
+      div
+        h2.card-title 追蹤清單
+        p.card-desc= `共 ${results.length} 檔股票`
+    if results.length
+      ul.stock-list
+        each row in results
+          - const priceList = row.tracePrice.join("_")
+          li.stock-item
+            .stock-head
+              span.stock-id= row.stockId
+              if canEdit
+                a.btn-icon.btn-icon-danger(href=`/tracks/${row.id}/delete` aria-label=`移除 ${row.stockId}` title="移除追蹤")
+                  +icon('trash')
+            .chips
+              each price in row.tracePrice
+                span.chip
+                  span= price
+                  if canEdit
+                    a.chip-remove(href=`/tracks/${row.id}/delete/${price}/${priceList}` aria-label=`移除提醒價格 ${price}`)
+                      +icon('x')
             if canEdit
-              form.form-inline(method="post",action=`/tracks/${row.id}/edit/${row.tracePrice.join("_")}`)
-                input.mr-2.form-control.form-control-sm(type="text" name='tracePrice')
-                button.btn.btn-outline-primary.btn-sm(type='submit') Add price
-          if canEdit
-            small.opacity-50.text-nowrap.btn: a(href=`/tracks/${row.id}/delete`) X
+              form.inline-form(method="post" action=`/tracks/${row.id}/edit/${priceList}`)
+                input.input.input-sm(type="text" name="tracePrice" placeholder="新增提醒價格" inputmode="decimal" autocomplete="off" aria-label=`${row.stockId} 新增提醒價格` required)
+                button.btn.btn-secondary.btn-sm(type="submit")
+                  +icon('plus')
+                  | 加入
+    else
+      .empty
+        span.empty-icon
+          +icon('chart')
+        p.empty-title 尚未追蹤任何股票
+        p.empty-text 新增股票代號與提醒價格後會顯示在這裡。
   //- .d-flex.flex-wrap.align-items-center
   //-   a.btn.btn-outline-primary.mr-2(href=`/push`) Push Test
   //-   a.btn.btn-outline-primary(href=`/push/total`) Push Total Stock

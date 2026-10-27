@@ -10,7 +10,7 @@ async function get(req, res, next) {
     const list = readDb().tracks;
     res.render("stock", {
       initialValue: { stockId: "", tracePrice: "" },
-      title: "Stock Tracker",
+      title: "股票追蹤",
       results: list,
       form_action: "/tracks",
     });

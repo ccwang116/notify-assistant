@@ -1,9 +1,17 @@
 extends layout.pug
 
 block content
-    .list-group.w-auto
-        each row in results
-          a.list-group-item.list-group-item-action.d-flex.gap-3.py-3(href=row.url)
-            .d-flex.gap-2.w-100.justify-content-between
-              h3.mb-0=row.title
-              small.opacity-50.text-nowrap.btn go settings
+  .page-head
+    h1.page-title= title
+    p.page-desc 選擇要調整的通知項目。
+
+  .nav-list
+    each row in results
+      a.nav-card(href=row.url)
+        span.nav-card-icon
+          +icon(row.icon)
+        span.nav-card-text
+          span.nav-card-title= row.title
+          span.nav-card-desc= row.desc
+        span.nav-card-chevron
+          +icon('chevron')

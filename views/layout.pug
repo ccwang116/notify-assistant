@@ -1,16 +1,26 @@
-html
+doctype html
+include _icons
+html(lang="zh-Hant")
   head
-    title Notify assistant
-    link(rel='stylesheet', type='text/css', href='/css/styles.css')
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title= title ? `${title} · Notify assistant` : "Notify assistant"
+    link(rel="preconnect" href="https://fonts.googleapis.com")
+    link(rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+    link(rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap")
+    link(rel="stylesheet" href="/css/styles.css")
   body
-    header.d-flex.flex-wrap.justify-content-center.py-3.px-1.mb-4
-        .header-container.d-flex.flex-wrap.justify-content-between
-            a.d-flex.align-items-center.mb-3.mb-md-0.me-md-auto.text-dark.text-decoration-none(href='/')
-                span.fs-4 Notify assistant
-            a.btn.btn-outline-light(href='/') Home
-    .container: div
-      h2.mb-4=title
+    header.topbar
+      .topbar-inner
+        a.brand(href="/")
+          span.brand-mark
+            +icon('bell')
+          span.brand-name Notify assistant
+        nav.topnav(aria-label="主要導覽")
+          each item in [{ label: "股票", url: "/stock" }, { label: "天氣", url: "/weather" }, { label: "公車", url: "/bus" }]
+            a.topnav-link(href=item.url class=currentPath === item.url ? "is-active" : "")= item.label
+
+    main.shell
       block content
 
-    footer
-    p.d-flex.justify-content-center.text-muted.py-5.small Copyright © CCWang ‧ Powered by CCWang
+    footer.footer Copyright © CCWang ‧ Powered by CCWang

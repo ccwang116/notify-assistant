@@ -1,25 +1,41 @@
 extends layout.pug
 
 block content
-  h6 Location setting：
-  .p-4.mb-3.bg-light.rounded
-    h6
-    .d-flex.flex-wrap.justify-content-between.align-items-center
-      span=`City(id) : ${locationId}`
-      a.btn.btn-outline-primary.btn-sm(href='https://opendata.cwa.gov.tw/opendatadoc/Opendata_City.pdf' target="_blank") See location id doc
-    h6 District Name:
-     span=currentLocation
-  if canEdit
-    form#edit-form(method="post",action=form_action)
-      .form-group
-        label(for='locationId') locationId
-        input#locationId.form-control(type='text' name='locationId' value=locationId)
-      .form-group
-        label(for='currentLocation') currentLocation
-        input#currentLocation.form-control(type='text' name='currentLocation' value=currentLocation)
-  else
-    include _edit-notice
-  .d-flex.flex-wrap.justify-content-center.align-items-center
-    if canEdit
-      button.btn.btn-primary.mr-2(type='submit' form='edit-form') Submit
-    a.btn.btn-outline-primary(href=`/weather/${locationId}/${currentLocation}`) Notify now
+  .page-head
+    h1.page-title= title
+    p.page-desc 設定要查詢的地區，每天固定時間推送天氣預報到 LINE。
+
+  form.card(method="post" action=form_action)
+    .card-head
+      div
+        h2.card-title 地區設定
+        p.card-desc 資料來源為中央氣象署開放資料。
+      a.link-subtle(href="https://opendata.cwa.gov.tw/opendatadoc/Opendata_City.pdf" target="_blank" rel="noopener")
+        | 地區代碼文件
+        +icon('external')
+    .card-body
+      if canEdit
+        .field-row
+          .field
+            label.field-label(for="locationId") 縣市資料集 ID
+            input#locationId.input(type="text" name="locationId" value=locationId autocomplete="off" spellcheck="false" required)
+            p.field-hint 例如 F-D0047-071
+          .field
+            label.field-label(for="currentLocation") 行政區
+            input#currentLocation.input(type="text" name="currentLocation" value=currentLocation autocomplete="off" required)
+            p.field-hint 例如 中和區
+      else
+        dl.summary
+          .summary-row
+            dt 縣市資料集 ID
+            dd= locationId
+          .summary-row
+            dt 行政區
+            dd= currentLocation
+        include _edit-notice
+    .card-foot
+      a.btn.btn-secondary(href=`/weather/${locationId}/${currentLocation}`)
+        +icon('send')
+        | 立即通知
+      if canEdit
+        button.btn.btn-primary(type="submit") 儲存設定
