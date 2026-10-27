@@ -1,7 +1,10 @@
 extends layout.pug
 
 block content
-  include _form
+  if canEdit
+    include _form
+  else
+    include _edit-notice
   .list-group.w-auto
     each row in results
       .list-group-item.list-group-item-action.d-flex.gap-3.py-3
@@ -10,11 +13,14 @@ block content
             h6.mb-3=row.stockId
             each price in row.tracePrice
                 span.badge.badge-secondary.badge-pill.mr-2.mb-3=price
-                    span.badge.badge-pill.ml-1: a(href=`/tracks/${row.id}/delete/${price}/${row.tracePrice.join("_")}`) X
-            form.form-inline(method="post",action=`/tracks/${row.id}/edit/${row.tracePrice.join("_")}`)
-              input.mr-2.form-control.form-control-sm(type="text" name='tracePrice')
-              button.btn.btn-outline-primary.btn-sm(type='submit') Add price
-          small.opacity-50.text-nowrap.btn: a(href=`/tracks/${row.id}/delete`) X
+                    if canEdit
+                      span.badge.badge-pill.ml-1: a(href=`/tracks/${row.id}/delete/${price}/${row.tracePrice.join("_")}`) X
+            if canEdit
+              form.form-inline(method="post",action=`/tracks/${row.id}/edit/${row.tracePrice.join("_")}`)
+                input.mr-2.form-control.form-control-sm(type="text" name='tracePrice')
+                button.btn.btn-outline-primary.btn-sm(type='submit') Add price
+          if canEdit
+            small.opacity-50.text-nowrap.btn: a(href=`/tracks/${row.id}/delete`) X
   //- .d-flex.flex-wrap.align-items-center
   //-   a.btn.btn-outline-primary.mr-2(href=`/push`) Push Test
   //-   a.btn.btn-outline-primary(href=`/push/total`) Push Total Stock

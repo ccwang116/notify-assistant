@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const mockData = require("../db.json");
+const { readDb } = require("../utils/db.util");
 const {
   getWeatherInfo,
   getWeatherTomorrowInfo,
@@ -12,7 +12,7 @@ router.get("/", (req, res, next) => {
   res.send("OK");
 });
 router.get("/weather", async (req, res, next) => {
-  const list = mockData.weather;
+  const list = readDb().weather;
   const result = await getWeatherInfo(list[0].locationId, list[0].locationName);
   if (result.status === 200) {
     res.status(200).json({
@@ -28,7 +28,7 @@ router.get("/weather", async (req, res, next) => {
   }
 });
 router.get("/weather_tomorrow", async (req, res, next) => {
-  const list = mockData.weather;
+  const list = readDb().weather;
   const result = await getWeatherTomorrowInfo(
     list[0].locationName,
   );
@@ -46,7 +46,7 @@ router.get("/weather_tomorrow", async (req, res, next) => {
   }
 });
 router.get("/stock", async (req, res, next) => {
-  const list = mockData.tracks;
+  const list = readDb().tracks;
   let recordList = [];
   console.log(list);
   for (let i = 0; i < list.length; i++) {
@@ -68,7 +68,7 @@ router.get("/stock", async (req, res, next) => {
   }
 });
 router.get("/bus", async (req, res, next) => {
-  const list = mockData.bus;
+  const list = readDb().bus;
   console.log(list);
   const element = list[0];
   getBusInfo(element.routeId, element.stopId);

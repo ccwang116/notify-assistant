@@ -1,7 +1,7 @@
 extends layout.pug
 
 block content
-  h6 Content settings： 
+  h6 Content settings：
   .p-4.mb-3.bg-light.rounded
     h6 Route (id) :
       .d-flex.flex-wrap.justify-content-between.align-items-center
@@ -9,15 +9,19 @@ block content
         a.btn.btn-outline-primary.btn-sm.ml-1(href='https://pda.5284.gov.taipei/MQS/routelist.jsp' target="_blank") Search each route id
     h6 Stop (id) :
     div: span=stopId
-  form(method="post",action=form_action)
-    .form-group
-      label(for='routeId') routeId
-      input#routeId.form-control(type='text' name='routeId' value=routeId)
-    .form-group
-      label(for='stopId') stopId
-      input#stopId.form-control(type='text' name='stopId' value=stopId)
-    .d-flex.flex-wrap.justify-content-center.align-items-center
-      button.btn.btn-primary.mr-2(type='submit') Submit
-      a.btn.btn-outline-primary(href=`/bus/${routeId}/${stopId}`) Notify now
-      a.btn.btn-outline-primary(href=`/bus/15521/12933/227/台北橋`) 227 台北橋
-      a.btn.btn-outline-primary(href=`/bus/15521/12954/227/安平路`) 227 安平路
+  if canEdit
+    form#edit-form(method="post",action=form_action)
+      .form-group
+        label(for='routeId') routeId
+        input#routeId.form-control(type='text' name='routeId' value=routeId)
+      .form-group
+        label(for='stopId') stopId
+        input#stopId.form-control(type='text' name='stopId' value=stopId)
+  else
+    include _edit-notice
+  .d-flex.flex-wrap.justify-content-center.align-items-center
+    if canEdit
+      button.btn.btn-primary.mr-2(type='submit' form='edit-form') Submit
+    a.btn.btn-outline-primary(href=`/bus/${routeId}/${stopId}`) Notify now
+    a.btn.btn-outline-primary(href=`/bus/15521/12933/227/台北橋`) 227 台北橋
+    a.btn.btn-outline-primary(href=`/bus/15521/12954/227/安平路`) 227 安平路

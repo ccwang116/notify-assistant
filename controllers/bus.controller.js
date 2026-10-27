@@ -1,6 +1,6 @@
 const axios = require("axios");
 const dayjs = require("dayjs");
-const mockData = require("../db.json");
+const { readDb } = require("../utils/db.util");
 const { makeNotify, reply } = require("./notify.controller");
 const bus = require("../services/bus.service");
 
@@ -56,9 +56,7 @@ const getBusInfoReply = (replyToken, routeId, stopId) => {
 };
 async function get(req, res, next) {
   try {
-    // const result = await bus.get();
-    // const list = result.data;
-    const list = mockData.bus;
+    const list = readDb().bus;
     res.render("bus", {
       title: "Bus page",
       routeId: list[0].routeId,

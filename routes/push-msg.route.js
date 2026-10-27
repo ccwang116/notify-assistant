@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const router = express.Router();
-const stockList = require("../db.json");
+const { readDb } = require("../utils/db.util");
 
 const { makeNotify } = require("../controllers/notify.controller");
 const { notifyTotal } = require("../controllers/tracks.controller");
@@ -15,7 +15,7 @@ router.get("/", function (req, res, next) {
   res.send("請見手機訊息");
 });
 router.get("/total", function (req, res, next) {
-  notifyTotal(stockList);
+  notifyTotal(readDb());
   res.send("請見手機訊息");
 });
 

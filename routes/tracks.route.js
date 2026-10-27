@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const tracks = require("../controllers/tracks.controller");
+const { requireEditable } = require("../utils/db.util");
+
+router.use(requireEditable);
 
 /* POST create a track */
 router.post("/", tracks.create);

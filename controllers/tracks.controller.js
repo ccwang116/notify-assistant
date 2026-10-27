@@ -3,11 +3,11 @@ const dayjs = require("dayjs");
 const tracks = require("../services/tracks.service");
 const axios = require("axios");
 const { makeNotify } = require("./notify.controller");
+const { readDb } = require("../utils/db.util");
 
 async function get(req, res, next) {
   try {
-    const result = await tracks.get();
-    const list = result.data;
+    const list = readDb().tracks;
     res.render("stock", {
       initialValue: { stockId: "", tracePrice: "" },
       title: "Stock Tracker",

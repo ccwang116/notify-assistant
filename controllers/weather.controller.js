@@ -5,6 +5,7 @@ const timezone = require("dayjs/plugin/timezone");
 const { makeNotify, reply } = require("./notify.controller");
 const stickerMap = require("../weather-sticker.json");
 const weather = require("../services/weather.service");
+const { readDb } = require("../utils/db.util");
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -159,8 +160,7 @@ const getWeatherTomorrowInfo = async (locationName) => {
 
 async function get(req, res, next) {
   try {
-    const result = await weather.get();
-    const list = result.data;
+    const list = readDb().weather;
     res.render("weather", {
       title: "Weather page",
       locationId: list[0].locationId,

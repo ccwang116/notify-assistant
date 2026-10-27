@@ -14,9 +14,8 @@ const stockRouter = require("./routes/stock.route");
 const weatherRouter = require("./routes/weather.route");
 const busRouter = require("./routes/bus.route");
 const dailyRouter = require("./routes/daily.route");
-const constructionRouter = require("./routes/under-construction.route");
 const pushMsg = require("./routes/push-msg.route");
-const mockData = require("./db.json");
+const { readDb, canEdit } = require("./utils/db.util");
 
 const { getStockInfo } = require("./controllers/tracks.controller");
 const {
@@ -38,7 +37,7 @@ app.set("view engine", "pug");
 //     dayjs().hour() < 14
 //   ) {
 //     console.log("Wait for 5 second...");
-//     const list = mockData.tracks;
+//     const list = readDb().tracks;
 //     console.log(list);
 //     for (let i = 0; i < list.length; i++) {
 //       const element = list[i];
@@ -50,11 +49,11 @@ app.set("view engine", "pug");
 // setInterval(() => {
 //   const timeNow = dayjs().format("HH:mm");
 //   if (timeNow === "08:20" || timeNow === "08:25") {
-//     const list = mockData.bus;
+//     const list = readDb().bus;
 //     getBusInfo(list[0].routeId, list[0].stopId);
 //   }
 //   if (timeNow === "08:05") {
-//     const list = mockData.weather;
+//     const list = readDb().weather;
 //     getWeatherInfo(list[0].locationId, list[0].locationName);
 //   }
 // }, 60000);
@@ -65,6 +64,10 @@ app.use(
     extended: true,
   }),
 );
+app.use((req, res, next) => {
+  res.locals.canEdit = canEdit;
+  next();
+});
 
 app.get("/", (req, res) => {
   res.render("home", {
@@ -76,17 +79,13 @@ app.get("/", (req, res) => {
     ],
   });
 });
-// app.use("/stock", stockRouter);
-app.use("/stock", constructionRouter);
+app.use("/stock", stockRouter);
 
-// app.use("/tracks", tracksRouter);
-app.use("/tracks", constructionRouter);
+app.use("/tracks", tracksRouter);
 
-// app.use("/weather", weatherRouter);
-app.use("/weather", constructionRouter);
+app.use("/weather", weatherRouter);
 
 app.use("/bus", busRouter);
-// app.use("/bus", constructionRouter);
 
 app.use("/daily", dailyRouter);
 
@@ -106,7 +105,7 @@ app.post("/webhook", async (req, res) => {
       const text = event.message.text;
 
       if (text === "公車") {
-        const list = mockData.bus;
+        const list = readDb().bus;
         const element = list[0];
 
         await getBusInfoReply(
@@ -115,7 +114,7 @@ app.post("/webhook", async (req, res) => {
           element.stopId,
         );
       } else if (text === "天氣") {
-        const list = mockData.weather;
+        const list = readDb().weather;
 
         await getWeatherInfoReply(
           event.replyToken,
